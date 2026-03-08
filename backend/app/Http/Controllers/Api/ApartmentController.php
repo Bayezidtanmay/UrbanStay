@@ -56,7 +56,13 @@ class ApartmentController extends Controller
             ], 404);
         }
 
-        return response()->json($apartment);
+        $averageRating = $apartment->reviews->avg('rating');
+
+        return response()->json([
+            'apartment' => $apartment,
+            'average_rating' => $averageRating ? round($averageRating, 1) : null,
+            'total_reviews' => $apartment->reviews->count(),
+        ]);
     }
 
     public function store(Request $request)
