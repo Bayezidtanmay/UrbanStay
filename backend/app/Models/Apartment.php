@@ -26,6 +26,12 @@ class Apartment extends Model
         'featured_image',
     ];
 
+    protected $casts = [
+        'is_available' => 'boolean',
+        'price_per_night' => 'decimal:2',
+        'price_per_month' => 'decimal:2',
+    ];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
