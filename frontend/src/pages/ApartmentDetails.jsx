@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
+import BookingForm from "../components/BookingForm";
+import ReviewSection from "../components/ReviewSection";
+import ContactBrokerForm from "../components/ContactBrokerForm";
 
 export default function ApartmentDetails() {
     const { id } = useParams();
@@ -24,7 +27,9 @@ export default function ApartmentDetails() {
     }, [id]);
 
     if (loading) return <Loading />;
-    if (!data?.apartment) return <p className="container page">Apartment not found.</p>;
+    if (!data?.apartment) {
+        return <p className="container page">Apartment not found.</p>;
+    }
 
     const { apartment, average_rating, total_reviews } = data;
 
@@ -62,6 +67,15 @@ export default function ApartmentDetails() {
                     <p><strong>Price per month:</strong> €{apartment.price_per_month}</p>
                 )}
             </div>
+
+            <BookingForm
+                apartmentId={apartment.id}
+                rentalType={apartment.rental_type}
+            />
+
+            <ReviewSection apartmentId={apartment.id} />
+
+            <ContactBrokerForm apartmentId={apartment.id} />
         </div>
     );
 }
