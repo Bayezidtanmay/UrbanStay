@@ -6,10 +6,14 @@ export default function AdminDashboard() {
             <h1>Admin Dashboard</h1>
 
             <div className="admin-grid">
-
                 <Link to="/admin/apartments" className="admin-card">
                     <h2>Manage Apartments</h2>
-                    <p>Create, edit, and delete apartments</p>
+                    <p>Create, view, and delete apartments</p>
+                </Link>
+
+                <Link to="/admin/apartments/create" className="admin-card">
+                    <h2>Create Apartment</h2>
+                    <p>Add a new apartment from the admin panel</p>
                 </Link>
 
                 <Link to="/admin/bookings" className="admin-card">
@@ -21,7 +25,6 @@ export default function AdminDashboard() {
                     <h2>Contact Messages</h2>
                     <p>View messages from customers</p>
                 </Link>
-
             </div>
         </div>
     );

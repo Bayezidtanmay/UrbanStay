@@ -10,6 +10,7 @@ import Dashboard from "../pages/Dashboard";
 import AdminRoute from "../components/AdminRoute";
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminApartments from "../pages/AdminApartments";
+import CreateApartment from "../pages/CreateApartment";
 
 export default function AppRouter() {
     return (
@@ -46,6 +47,15 @@ export default function AppRouter() {
                     element={
                         <AdminRoute>
                             <AdminApartments />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/apartments/create"
+                    element={
+                        <AdminRoute>
+                            <CreateApartment />
                         </AdminRoute>
                     }
                 />

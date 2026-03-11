@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
 
 export default function AdminApartments() {
-
     const [apartments, setApartments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
 
     async function fetchApartments() {
         try {
             setLoading(true);
+            setError("");
             const data = await apiFetch("/apartments");
             setApartments(data.data || []);
         } catch (err) {
-            console.error(err);
+            setError(err.message || "Failed to load apartments.");
         } finally {
             setLoading(false);
         }
@@ -24,16 +27,21 @@ export default function AdminApartments() {
     }, []);
 
     async function deleteApartment(id) {
-        if (!confirm("Delete this apartment?")) return;
+        const confirmed = window.confirm("Delete this apartment?");
+        if (!confirmed) return;
 
         try {
-            await apiFetch(`/apartments/${id}`, {
+            setMessage("");
+            setError("");
+
+            const data = await apiFetch(`/apartments/${id}`, {
                 method: "DELETE",
             });
 
+            setMessage(data.message || "Apartment deleted successfully.");
             fetchApartments();
         } catch (err) {
-            console.error(err);
+            setError(err.message || "Failed to delete apartment.");
         }
     }
 
@@ -41,23 +49,42 @@ export default function AdminApartments() {
 
     return (
         <div className="container page">
-            <h1>Manage Apartments</h1>
+            <div className="admin-header">
+                <h1>Manage Apartments</h1>
+                <Link to="/admin/apartments/create" className="btn">
+                    Add Apartment
+                </Link>
+            </div>
 
-            {apartments.map((apt) => (
-                <div key={apt.id} className="admin-item">
+            {message && <p className="success-text">{message}</p>}
+            {error && <p className="error-text">{error}</p>}
 
-                    <h3>{apt.title}</h3>
-                    <p>{apt.location}</p>
+            {apartments.length === 0 ? (
+                <p>No apartments available.</p>
+            ) : (
+                apartments.map((apt) => (
+                    <div key={apt.id} className="admin-item">
+                        <h3>{apt.title}</h3>
+                        <p><strong>Location:</strong> {apt.location}</p>
+                        <p><strong>Rental Type:</strong> {apt.rental_type}</p>
 
-                    <button
-                        className="btn btn-danger"
-                        onClick={() => deleteApartment(apt.id)}
-                    >
-                        Delete
-                    </button>
+                        {apt.price_per_night && (
+                            <p><strong>Nightly:</strong> €{apt.price_per_night}</p>
+                        )}
 
-                </div>
-            ))}
+                        {apt.price_per_month && (
+                            <p><strong>Monthly:</strong> €{apt.price_per_month}</p>
+                        )}
+
+                        <button
+                            className="btn btn-danger"
+                            onClick={() => deleteApartment(apt.id)}
+                        >
+                            Delete
+                        </button>
+                    </div>
+                ))
+            )}
         </div>
     );
 }
