@@ -5,21 +5,27 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Apartment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApartmentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Apartment::with('creator:id,name,email')
-            ->latest();
+        $query = Apartment::with('creator:id,name,email')->latest();
 
         if ($request->filled('location')) {
             $query->where('location', 'like', '%' . $request->location . '%');
         }
 
         if ($request->filled('rental_type')) {
-            $query->where('rental_type', $request->rental_type);
+            if ($request->rental_type === 'nightly') {
+                $query->whereIn('rental_type', ['nightly', 'both']);
+            } elseif ($request->rental_type === 'monthly') {
+                $query->whereIn('rental_type', ['monthly', 'both']);
+            } elseif ($request->rental_type === 'both') {
+                $query->where('rental_type', 'both');
+            }
         }
 
         if ($request->filled('min_price')) {
@@ -79,14 +85,30 @@ class ApartmentController extends Controller
             'bathrooms' => ['required', 'integer', 'min:1'],
             'size' => ['nullable', 'integer', 'min:1'],
             'is_available' => ['nullable', 'boolean'],
-            'featured_image' => ['nullable', 'string'],
+            'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
+        $imagePath = null;
+
+        if ($request->hasFile('featured_image')) {
+            $imagePath = $request->file('featured_image')->store('apartments', 'public');
+        }
+
         $apartment = Apartment::create([
-            ...$validated,
             'created_by' => $request->user()->id,
+            'title' => $validated['title'],
             'slug' => Str::slug($validated['title']) . '-' . Str::random(6),
+            'description' => $validated['description'],
+            'location' => $validated['location'],
+            'address' => $validated['address'],
+            'price_per_night' => $validated['price_per_night'] ?? null,
+            'price_per_month' => $validated['price_per_month'] ?? null,
+            'rental_type' => $validated['rental_type'],
+            'bedrooms' => $validated['bedrooms'],
+            'bathrooms' => $validated['bathrooms'],
+            'size' => $validated['size'] ?? null,
             'is_available' => $validated['is_available'] ?? true,
+            'featured_image' => $imagePath ? asset('storage/' . $imagePath) : null,
         ]);
 
         return response()->json([
@@ -117,11 +139,21 @@ class ApartmentController extends Controller
             'bathrooms' => ['sometimes', 'integer', 'min:1'],
             'size' => ['nullable', 'integer', 'min:1'],
             'is_available' => ['nullable', 'boolean'],
-            'featured_image' => ['nullable', 'string'],
+            'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         if (isset($validated['title'])) {
             $validated['slug'] = Str::slug($validated['title']) . '-' . Str::random(6);
+        }
+
+        if ($request->hasFile('featured_image')) {
+            if ($apartment->featured_image) {
+                $oldPath = str_replace(asset('storage/') . '/', '', $apartment->featured_image);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $newImagePath = $request->file('featured_image')->store('apartments', 'public');
+            $validated['featured_image'] = asset('storage/' . $newImagePath);
         }
 
         $apartment->update($validated);
@@ -140,6 +172,11 @@ class ApartmentController extends Controller
             return response()->json([
                 'message' => 'Apartment not found',
             ], 404);
+        }
+
+        if ($apartment->featured_image) {
+            $oldPath = str_replace(asset('storage/') . '/', '', $apartment->featured_image);
+            Storage::disk('public')->delete($oldPath);
         }
 
         $apartment->delete();
