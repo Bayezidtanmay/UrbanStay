@@ -31,6 +31,9 @@ export default function Navbar() {
                     {user && (
                         <>
                             <Link to="/dashboard">Dashboard</Link>
+                            {isAdmin && (
+                                <Link to="/admin">Admin</Link>
+                            )}
                             <span className="welcome">Hi, {user.name}</span>
                             {isAdmin && <span className="admin-badge">Admin</span>}
                             <button onClick={handleLogout} className="btn btn-small">

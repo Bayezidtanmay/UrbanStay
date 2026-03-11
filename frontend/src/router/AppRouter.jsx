@@ -7,6 +7,9 @@ import ApartmentDetails from "../pages/ApartmentDetails";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
+import AdminRoute from "../components/AdminRoute";
+import AdminDashboard from "../pages/AdminDashboard";
+import AdminApartments from "../pages/AdminApartments";
 
 export default function AppRouter() {
     return (
@@ -26,6 +29,24 @@ export default function AppRouter() {
                         <ProtectedRoute>
                             <Dashboard />
                         </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin"
+                    element={
+                        <AdminRoute>
+                            <AdminDashboard />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/apartments"
+                    element={
+                        <AdminRoute>
+                            <AdminApartments />
+                        </AdminRoute>
                     }
                 />
             </Routes>
