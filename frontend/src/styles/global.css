@@ -224,3 +224,15 @@
   .subheading {
     margin: 10px 0 16px;
   }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 30px;
+  }
+  
+  .page-info {
+    font-weight: 600;
+  }

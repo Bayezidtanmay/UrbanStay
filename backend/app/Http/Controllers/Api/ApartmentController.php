@@ -36,7 +36,7 @@ class ApartmentController extends Controller
             });
         }
 
-        $apartments = $query->paginate(10);
+        $apartments = $query->paginate(20);
 
         return response()->json($apartments);
     }

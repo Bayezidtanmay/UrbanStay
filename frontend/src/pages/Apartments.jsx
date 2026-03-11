@@ -6,38 +6,63 @@ import Loading from "../components/Loading";
 export default function Apartments() {
     const [apartments, setApartments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+
     const [location, setLocation] = useState("");
     const [rentalType, setRentalType] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
 
-    async function fetchApartments() {
+    async function fetchApartments(pageNumber = 1) {
         try {
             setLoading(true);
+            setError("");
 
             const params = new URLSearchParams();
 
-            if (location) params.append("location", location);
+            params.append("page", pageNumber);
+
+            if (location.trim()) params.append("location", location.trim());
             if (rentalType) params.append("rental_type", rentalType);
             if (minPrice) params.append("min_price", minPrice);
             if (maxPrice) params.append("max_price", maxPrice);
 
-            const data = await apiFetch(`/apartments?${params.toString()}`);
+            const endpoint = `/apartments?${params.toString()}`;
+
+            const data = await apiFetch(endpoint);
+
             setApartments(data.data || []);
-        } catch (error) {
-            console.error(error.message);
+            setPage(data.current_page);
+            setLastPage(data.last_page);
+        } catch (err) {
+            setError(err.message || "Failed to load apartments.");
         } finally {
             setLoading(false);
         }
     }
 
     useEffect(() => {
-        fetchApartments();
+        fetchApartments(1);
     }, []);
 
     function handleSubmit(e) {
         e.preventDefault();
-        fetchApartments();
+        fetchApartments(1);
+    }
+
+    function goToNextPage() {
+        if (page < lastPage) {
+            fetchApartments(page + 1);
+        }
+    }
+
+    function goToPreviousPage() {
+        if (page > 1) {
+            fetchApartments(page - 1);
+        }
     }
 
     return (
@@ -83,14 +108,40 @@ export default function Apartments() {
 
             {loading ? (
                 <Loading />
+            ) : error ? (
+                <p className="error-text">{error}</p>
             ) : apartments.length === 0 ? (
                 <p>No apartments found.</p>
             ) : (
-                <div className="apartment-grid">
-                    {apartments.map((apartment) => (
-                        <ApartmentCard key={apartment.id} apartment={apartment} />
-                    ))}
-                </div>
+                <>
+                    <div className="apartment-grid">
+                        {apartments.map((apartment) => (
+                            <ApartmentCard key={apartment.id} apartment={apartment} />
+                        ))}
+                    </div>
+
+                    <div className="pagination">
+                        <button
+                            className="btn"
+                            disabled={page === 1}
+                            onClick={goToPreviousPage}
+                        >
+                            Previous
+                        </button>
+
+                        <span className="page-info">
+                            Page {page} of {lastPage}
+                        </span>
+
+                        <button
+                            className="btn"
+                            disabled={page === lastPage}
+                            onClick={goToNextPage}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </>
             )}
         </div>
     );
