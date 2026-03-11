@@ -236,3 +236,29 @@
   .page-info {
     font-weight: 600;
   }
+
+  .booking-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .booking-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
+    background: #f9fafb;
+  }
+  
+  .booking-item h3 {
+    margin-bottom: 10px;
+  }
+  
+  .booking-item p {
+    margin-bottom: 8px;
+  }
+  
+  .btn-danger {
+    background: #dc2626;
+    margin-top: 10px;
+  }
