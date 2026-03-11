@@ -12,6 +12,7 @@ import AdminDashboard from "../pages/AdminDashboard";
 import AdminApartments from "../pages/AdminApartments";
 import CreateApartment from "../pages/CreateApartment";
 import AdminBookings from "../pages/AdminBookings";
+import AdminMessages from "../pages/AdminMessages";
 
 export default function AppRouter() {
     return (
@@ -66,6 +67,15 @@ export default function AppRouter() {
                     element={
                         <AdminRoute>
                             <AdminBookings />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/messages"
+                    element={
+                        <AdminRoute>
+                            <AdminMessages />
                         </AdminRoute>
                     }
                 />
