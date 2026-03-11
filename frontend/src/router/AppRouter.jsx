@@ -11,6 +11,7 @@ import AdminRoute from "../components/AdminRoute";
 import AdminDashboard from "../pages/AdminDashboard";
 import AdminApartments from "../pages/AdminApartments";
 import CreateApartment from "../pages/CreateApartment";
+import AdminBookings from "../pages/AdminBookings";
 
 export default function AppRouter() {
     return (
@@ -56,6 +57,15 @@ export default function AppRouter() {
                     element={
                         <AdminRoute>
                             <CreateApartment />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/bookings"
+                    element={
+                        <AdminRoute>
+                            <AdminBookings />
                         </AdminRoute>
                     }
                 />

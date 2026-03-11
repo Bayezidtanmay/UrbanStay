@@ -302,3 +302,14 @@
     align-items: center;
     gap: 10px;
   }
+
+  .admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  
+  .btn-warning {
+    background: #d97706;
+  }
