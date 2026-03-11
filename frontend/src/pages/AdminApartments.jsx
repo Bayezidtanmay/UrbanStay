@@ -76,12 +76,18 @@ export default function AdminApartments() {
                             <p><strong>Monthly:</strong> €{apt.price_per_month}</p>
                         )}
 
-                        <button
-                            className="btn btn-danger"
-                            onClick={() => deleteApartment(apt.id)}
-                        >
-                            Delete
-                        </button>
+                        <div className="admin-actions">
+                            <Link to={`/admin/apartments/edit/${apt.id}`} className="btn">
+                                Edit
+                            </Link>
+
+                            <button
+                                className="btn btn-danger"
+                                onClick={() => deleteApartment(apt.id)}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 ))
             )}

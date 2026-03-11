@@ -341,3 +341,15 @@
     border-radius: 10px;
     padding: 12px;
   }
+
+  .auth-form label {
+    font-weight: 600;
+    margin-top: 14px;
+    display: block;
+  }
+  
+  .auth-form input,
+  .auth-form textarea,
+  .auth-form select {
+    margin-top: 6px;
+  }

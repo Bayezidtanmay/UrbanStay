@@ -13,6 +13,7 @@ import AdminApartments from "../pages/AdminApartments";
 import CreateApartment from "../pages/CreateApartment";
 import AdminBookings from "../pages/AdminBookings";
 import AdminMessages from "../pages/AdminMessages";
+import EditApartment from "../pages/EditApartment";
 
 export default function AppRouter() {
     return (
@@ -76,6 +77,15 @@ export default function AppRouter() {
                     element={
                         <AdminRoute>
                             <AdminMessages />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/apartments/edit/:id"
+                    element={
+                        <AdminRoute>
+                            <EditApartment />
                         </AdminRoute>
                     }
                 />
