@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Apartment;
+use App\Models\ApartmentImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -86,6 +87,7 @@ class ApartmentController extends Controller
             'size' => ['nullable', 'integer', 'min:1'],
             'is_available' => ['nullable', 'boolean'],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'gallery_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $imagePath = null;
@@ -111,15 +113,26 @@ class ApartmentController extends Controller
             'featured_image' => $imagePath ? asset('storage/' . $imagePath) : null,
         ]);
 
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $image) {
+                $galleryPath = $image->store('apartments/gallery', 'public');
+
+                ApartmentImage::create([
+                    'apartment_id' => $apartment->id,
+                    'image_path' => asset('storage/' . $galleryPath),
+                ]);
+            }
+        }
+
         return response()->json([
             'message' => 'Apartment created successfully',
-            'apartment' => $apartment,
+            'apartment' => $apartment->load('images'),
         ], 201);
     }
 
     public function update(Request $request, $id)
     {
-        $apartment = Apartment::find($id);
+        $apartment = Apartment::with('images')->find($id);
 
         if (! $apartment) {
             return response()->json([
@@ -140,6 +153,8 @@ class ApartmentController extends Controller
             'size' => ['nullable', 'integer', 'min:1'],
             'is_available' => ['nullable', 'boolean'],
             'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'gallery_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'replace_gallery' => ['nullable', 'boolean'],
         ]);
 
         if (isset($validated['title'])) {
@@ -158,15 +173,34 @@ class ApartmentController extends Controller
 
         $apartment->update($validated);
 
+        if ($request->boolean('replace_gallery')) {
+            foreach ($apartment->images as $image) {
+                $oldGalleryPath = str_replace(asset('storage/') . '/', '', $image->image_path);
+                Storage::disk('public')->delete($oldGalleryPath);
+                $image->delete();
+            }
+        }
+
+        if ($request->hasFile('gallery_images')) {
+            foreach ($request->file('gallery_images') as $image) {
+                $galleryPath = $image->store('apartments/gallery', 'public');
+
+                ApartmentImage::create([
+                    'apartment_id' => $apartment->id,
+                    'image_path' => asset('storage/' . $galleryPath),
+                ]);
+            }
+        }
+
         return response()->json([
             'message' => 'Apartment updated successfully',
-            'apartment' => $apartment,
+            'apartment' => $apartment->fresh()->load('images'),
         ]);
     }
 
     public function destroy($id)
     {
-        $apartment = Apartment::find($id);
+        $apartment = Apartment::with('images')->find($id);
 
         if (! $apartment) {
             return response()->json([
@@ -177,6 +211,12 @@ class ApartmentController extends Controller
         if ($apartment->featured_image) {
             $oldPath = str_replace(asset('storage/') . '/', '', $apartment->featured_image);
             Storage::disk('public')->delete($oldPath);
+        }
+
+        foreach ($apartment->images as $image) {
+            $oldGalleryPath = str_replace(asset('storage/') . '/', '', $image->image_path);
+            Storage::disk('public')->delete($oldGalleryPath);
+            $image->delete();
         }
 
         $apartment->delete();
