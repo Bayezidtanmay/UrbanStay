@@ -18,9 +18,11 @@ export default function CreateApartment() {
         size: "",
         is_available: true,
         featured_image: null,
+        gallery_images: [],
     });
 
     const [imagePreview, setImagePreview] = useState("");
+    const [galleryPreview, setGalleryPreview] = useState([]);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -28,10 +30,17 @@ export default function CreateApartment() {
     function handleChange(e) {
         const { name, value, type, checked, files } = e.target;
 
-        if (type === "file") {
+        if (name === "featured_image") {
             const file = files[0] || null;
-            setForm((prev) => ({ ...prev, [name]: file }));
+            setForm((prev) => ({ ...prev, featured_image: file }));
             setImagePreview(file ? URL.createObjectURL(file) : "");
+            return;
+        }
+
+        if (name === "gallery_images") {
+            const selectedFiles = Array.from(files || []);
+            setForm((prev) => ({ ...prev, gallery_images: selectedFiles }));
+            setGalleryPreview(selectedFiles.map((file) => URL.createObjectURL(file)));
             return;
         }
 
@@ -63,6 +72,10 @@ export default function CreateApartment() {
             if (form.price_per_month !== "") formData.append("price_per_month", form.price_per_month);
             if (form.size !== "") formData.append("size", form.size);
             if (form.featured_image) formData.append("featured_image", form.featured_image);
+
+            form.gallery_images.forEach((file) => {
+                formData.append("gallery_images[]", file);
+            });
 
             const data = await apiFetch("/apartments", {
                 method: "POST",
@@ -122,9 +135,17 @@ export default function CreateApartment() {
 
                 <label>Featured Image</label>
                 <input type="file" name="featured_image" accept="image/*" onChange={handleChange} />
+                {imagePreview && <img src={imagePreview} alt="Preview" className="image-preview" />}
 
-                {imagePreview && (
-                    <img src={imagePreview} alt="Preview" className="image-preview" />
+                <label>Gallery Images</label>
+                <input type="file" name="gallery_images" accept="image/*" multiple onChange={handleChange} />
+
+                {galleryPreview.length > 0 && (
+                    <div className="gallery-preview-grid">
+                        {galleryPreview.map((src, index) => (
+                            <img key={index} src={src} alt={`Gallery preview ${index + 1}`} className="gallery-preview-image" />
+                        ))}
+                    </div>
                 )}
 
                 <label className="checkbox-row">

@@ -5,6 +5,7 @@ import Loading from "../components/Loading";
 import BookingForm from "../components/BookingForm";
 import ReviewSection from "../components/ReviewSection";
 import ContactBrokerForm from "../components/ContactBrokerForm";
+import ImageSlider from "../components/ImageSlider";
 
 export default function ApartmentDetails() {
     const { id } = useParams();
@@ -37,14 +38,10 @@ export default function ApartmentDetails() {
         <div className="container page">
             <h1>{apartment.title}</h1>
 
-            <img
-                src={
-                    apartment.featured_image
-                        ? apartment.featured_image
-                        : "https://via.placeholder.com/800x400?text=UrbanStay"
-                }
-                alt={apartment.title}
-                className="details-image"
+            <ImageSlider
+                featuredImage={apartment.featured_image}
+                galleryImages={apartment.images || []}
+                title={apartment.title}
             />
 
             <div className="details-card">

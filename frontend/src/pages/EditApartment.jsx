@@ -12,6 +12,7 @@ export default function EditApartment() {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [currentImage, setCurrentImage] = useState("");
+    const [currentGallery, setCurrentGallery] = useState([]);
 
     const [form, setForm] = useState({
         title: "",
@@ -26,9 +27,12 @@ export default function EditApartment() {
         size: "",
         is_available: true,
         featured_image: null,
+        gallery_images: [],
+        replace_gallery: false,
     });
 
     const [imagePreview, setImagePreview] = useState("");
+    const [galleryPreview, setGalleryPreview] = useState([]);
 
     useEffect(() => {
         async function fetchApartment() {
@@ -52,9 +56,12 @@ export default function EditApartment() {
                     size: apartment.size ?? "",
                     is_available: Boolean(apartment.is_available),
                     featured_image: null,
+                    gallery_images: [],
+                    replace_gallery: false,
                 });
 
                 setCurrentImage(apartment.featured_image || "");
+                setCurrentGallery(apartment.images || []);
             } catch (err) {
                 setError(err.message || "Failed to load apartment.");
             } finally {
@@ -68,10 +75,17 @@ export default function EditApartment() {
     function handleChange(e) {
         const { name, value, type, checked, files } = e.target;
 
-        if (type === "file") {
+        if (name === "featured_image") {
             const file = files[0] || null;
-            setForm((prev) => ({ ...prev, [name]: file }));
+            setForm((prev) => ({ ...prev, featured_image: file }));
             setImagePreview(file ? URL.createObjectURL(file) : "");
+            return;
+        }
+
+        if (name === "gallery_images") {
+            const selectedFiles = Array.from(files || []);
+            setForm((prev) => ({ ...prev, gallery_images: selectedFiles }));
+            setGalleryPreview(selectedFiles.map((file) => URL.createObjectURL(file)));
             return;
         }
 
@@ -99,11 +113,16 @@ export default function EditApartment() {
             formData.append("bedrooms", form.bedrooms);
             formData.append("bathrooms", form.bathrooms);
             formData.append("is_available", form.is_available ? "1" : "0");
+            formData.append("replace_gallery", form.replace_gallery ? "1" : "0");
 
             if (form.price_per_night !== "") formData.append("price_per_night", form.price_per_night);
             if (form.price_per_month !== "") formData.append("price_per_month", form.price_per_month);
             if (form.size !== "") formData.append("size", form.size);
             if (form.featured_image) formData.append("featured_image", form.featured_image);
+
+            form.gallery_images.forEach((file) => {
+                formData.append("gallery_images[]", file);
+            });
 
             const data = await apiFetch(`/apartments/${id}`, {
                 method: "POST",
@@ -169,10 +188,43 @@ export default function EditApartment() {
                 {currentImage && !imagePreview && (
                     <img src={currentImage} alt="Current apartment" className="image-preview" />
                 )}
-
                 {imagePreview && (
                     <img src={imagePreview} alt="Preview" className="image-preview" />
                 )}
+
+                <label>Upload New Gallery Images</label>
+                <input type="file" name="gallery_images" accept="image/*" multiple onChange={handleChange} />
+
+                {currentGallery.length > 0 && !galleryPreview.length && (
+                    <div className="gallery-preview-grid">
+                        {currentGallery.map((image) => (
+                            <img
+                                key={image.id}
+                                src={image.image_path}
+                                alt="Current gallery"
+                                className="gallery-preview-image"
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {galleryPreview.length > 0 && (
+                    <div className="gallery-preview-grid">
+                        {galleryPreview.map((src, index) => (
+                            <img key={index} src={src} alt={`Gallery preview ${index + 1}`} className="gallery-preview-image" />
+                        ))}
+                    </div>
+                )}
+
+                <label className="checkbox-row">
+                    <input
+                        type="checkbox"
+                        name="replace_gallery"
+                        checked={form.replace_gallery}
+                        onChange={handleChange}
+                    />
+                    Replace existing gallery images
+                </label>
 
                 <label className="checkbox-row">
                     <input
