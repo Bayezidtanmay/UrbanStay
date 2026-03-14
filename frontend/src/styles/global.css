@@ -528,3 +528,48 @@
     border: 1px solid #e5e7eb;
     background: white;
   }
+
+  .map-page {
+    min-height: 100vh;
+    background: #f5f7fb;
+  }
+  
+  .map-header {
+    padding: 20px 24px 10px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .map-header h1 {
+    margin-bottom: 6px;
+  }
+  
+  .map-header p {
+    color: #666;
+  }
+  
+  .map-view-wrapper {
+    height: calc(100vh - 88px);
+  }
+  
+  .map-popup {
+    width: 220px;
+  }
+  
+  .map-popup-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .map-popup h3 {
+    margin-bottom: 6px;
+    font-size: 16px;
+  }
+  
+  .map-popup p {
+    margin-bottom: 6px;
+    color: #444;
+  }

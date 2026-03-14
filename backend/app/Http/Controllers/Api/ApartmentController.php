@@ -70,6 +70,18 @@ class ApartmentController extends Controller
             });
         }
 
+        if (
+            $request->filled('lat_min') &&
+            $request->filled('lat_max') &&
+            $request->filled('lng_min') &&
+            $request->filled('lng_max')
+        ) {
+            $query->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->whereBetween('latitude', [(float) $request->lat_min, (float) $request->lat_max])
+                ->whereBetween('longitude', [(float) $request->lng_min, (float) $request->lng_max]);
+        }
+
         $apartments = $query->paginate(20);
 
         return response()->json($apartments);
