@@ -6,11 +6,38 @@ use App\Http\Controllers\Controller;
 use App\Models\Apartment;
 use App\Models\ApartmentImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApartmentController extends Controller
 {
+    private function geocodeAddress(string $address): array
+    {
+        $response = Http::withHeaders([
+            'User-Agent' => 'UrbanStay/1.0',
+        ])->get('https://nominatim.openstreetmap.org/search', [
+            'q' => $address,
+            'format' => 'jsonv2',
+            'limit' => 1,
+        ]);
+
+        if (! $response->successful()) {
+            return ['latitude' => null, 'longitude' => null];
+        }
+
+        $data = $response->json();
+
+        if (empty($data) || ! isset($data[0]['lat'], $data[0]['lon'])) {
+            return ['latitude' => null, 'longitude' => null];
+        }
+
+        return [
+            'latitude' => (float) $data[0]['lat'],
+            'longitude' => (float) $data[0]['lon'],
+        ];
+    }
+
     public function index(Request $request)
     {
         $query = Apartment::with('creator:id,name,email')->latest();
@@ -96,6 +123,9 @@ class ApartmentController extends Controller
             $imagePath = $request->file('featured_image')->store('apartments', 'public');
         }
 
+        $fullAddress = $validated['address'] . ', ' . $validated['location'] . ', Finland';
+        $coordinates = $this->geocodeAddress($fullAddress);
+
         $apartment = Apartment::create([
             'created_by' => $request->user()->id,
             'title' => $validated['title'],
@@ -111,6 +141,8 @@ class ApartmentController extends Controller
             'size' => $validated['size'] ?? null,
             'is_available' => $validated['is_available'] ?? true,
             'featured_image' => $imagePath ? asset('storage/' . $imagePath) : null,
+            'latitude' => $coordinates['latitude'],
+            'longitude' => $coordinates['longitude'],
         ]);
 
         if ($request->hasFile('gallery_images')) {
@@ -170,6 +202,12 @@ class ApartmentController extends Controller
             $newImagePath = $request->file('featured_image')->store('apartments', 'public');
             $validated['featured_image'] = asset('storage/' . $newImagePath);
         }
+
+        $fullAddress = ($validated['address'] ?? $apartment->address) . ', ' . ($validated['location'] ?? $apartment->location) . ', Finland';
+        $coordinates = $this->geocodeAddress($fullAddress);
+
+        $validated['latitude'] = $coordinates['latitude'];
+        $validated['longitude'] = $coordinates['longitude'];
 
         $apartment->update($validated);
 

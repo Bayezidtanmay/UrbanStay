@@ -24,12 +24,16 @@ class Apartment extends Model
         'size',
         'is_available',
         'featured_image',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
         'is_available' => 'boolean',
         'price_per_night' => 'decimal:2',
         'price_per_month' => 'decimal:2',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     public function creator()
