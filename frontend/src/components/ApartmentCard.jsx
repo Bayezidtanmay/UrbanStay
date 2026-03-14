@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import ApartmentMap from "./ApartmentMap";
 
 export default function ApartmentCard({ apartment }) {
     return (
@@ -27,6 +28,13 @@ export default function ApartmentCard({ apartment }) {
                         <span>€{apartment.price_per_month} / month</span>
                     )}
                 </div>
+
+                <ApartmentMap
+                    latitude={apartment.latitude}
+                    longitude={apartment.longitude}
+                    title={apartment.title}
+                    small={true}
+                />
 
                 <Link to={`/apartments/${apartment.id}`} className="btn">
                     View Details
