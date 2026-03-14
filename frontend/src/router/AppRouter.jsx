@@ -14,6 +14,7 @@ import CreateApartment from "../pages/CreateApartment";
 import AdminBookings from "../pages/AdminBookings";
 import AdminMessages from "../pages/AdminMessages";
 import EditApartment from "../pages/EditApartment";
+import MapView from "../pages/MapView";
 
 export default function AppRouter() {
     return (
@@ -89,6 +90,7 @@ export default function AppRouter() {
                         </AdminRoute>
                     }
                 />
+                <Route path="/map" element={<MapView />} />
             </Routes>
         </BrowserRouter>
     );
