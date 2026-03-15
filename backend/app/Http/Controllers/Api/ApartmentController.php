@@ -94,6 +94,7 @@ class ApartmentController extends Controller
             'images',
             'reviews.user:id,name',
             'unavailableDates',
+            'bookings',
         ])->find($id);
 
         if (! $apartment) {

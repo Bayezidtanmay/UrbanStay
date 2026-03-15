@@ -768,3 +768,40 @@
   .react-datepicker__day:hover {
     border-radius: 999px;
   }
+
+  .booking-hint {
+    color: #4b5563;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+  
+  .booking-summary {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 10px;
+  }
+  
+  .booking-summary p {
+    margin-bottom: 6px;
+  }
+  
+  .booking-summary p:last-child {
+    margin-bottom: 0;
+  }
+
+  .blocked-date {
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+    border-radius: 999px !important;
+    text-decoration: line-through;
+    font-weight: 600;
+  }
+  
+  .react-datepicker__day--disabled.blocked-date {
+    background: #fecaca !important;
+    color: #991b1b !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+  }

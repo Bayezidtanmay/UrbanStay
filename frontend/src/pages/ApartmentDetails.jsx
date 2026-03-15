@@ -75,6 +75,9 @@ export default function ApartmentDetails() {
             <BookingForm
                 apartmentId={apartment.id}
                 rentalType={apartment.rental_type}
+                pricePerNight={apartment.price_per_night}
+                pricePerMonth={apartment.price_per_month}
+                bookings={apartment.bookings || []}
             />
 
             <ReviewSection apartmentId={apartment.id} />
