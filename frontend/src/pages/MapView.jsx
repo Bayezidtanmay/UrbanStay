@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { Link } from "react-router-dom";
 import L from "leaflet";
 import { apiFetch } from "../api/client";
 import MapBoundsUpdater from "../components/MapBoundsUpdater";
+import MapFlyToLocation from "../components/MapFlyToLocation";
 
 function createPriceIcon(apartment, isActive = false) {
     let parts = [];
@@ -31,6 +32,9 @@ export default function MapView() {
     const [apartments, setApartments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeApartmentId, setActiveApartmentId] = useState(null);
+    const [selectedApartment, setSelectedApartment] = useState(null);
+
+    const markerRefs = useRef({});
 
     const fetchApartments = useCallback(async (bounds = null) => {
         try {
@@ -62,6 +66,20 @@ export default function MapView() {
         fetchApartments();
     }, [fetchApartments]);
 
+    useEffect(() => {
+        if (!selectedApartment) return;
+
+        const marker = markerRefs.current[selectedApartment.id];
+        if (marker) {
+            marker.openPopup();
+        }
+    }, [selectedApartment]);
+
+    function handleCardClick(apartment) {
+        setSelectedApartment(apartment);
+        setActiveApartmentId(apartment.id);
+    }
+
     return (
         <div className="map-page-split">
             <div className="map-list-panel">
@@ -75,12 +93,12 @@ export default function MapView() {
                         <p>No apartments in this area.</p>
                     ) : (
                         apartments.map((apartment) => (
-                            <Link
-                                to={`/apartments/${apartment.id}`}
+                            <div
                                 key={apartment.id}
                                 className={`map-list-card ${activeApartmentId === apartment.id ? "active-map-list-card" : ""}`}
                                 onMouseEnter={() => setActiveApartmentId(apartment.id)}
                                 onMouseLeave={() => setActiveApartmentId(null)}
+                                onClick={() => handleCardClick(apartment)}
                             >
                                 <img
                                     src={
@@ -105,8 +123,16 @@ export default function MapView() {
                                             <span>€{apartment.price_per_month} / month</span>
                                         )}
                                     </div>
+
+                                    <Link
+                                        to={`/apartments/${apartment.id}`}
+                                        className="btn map-card-btn"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        View Apartment
+                                    </Link>
                                 </div>
-                            </Link>
+                            </div>
                         ))
                     )}
                 </div>
@@ -124,6 +150,7 @@ export default function MapView() {
                     />
 
                     <MapBoundsUpdater onBoundsChange={fetchApartments} />
+                    <MapFlyToLocation apartment={selectedApartment} />
 
                     {apartments.map((apartment) => {
                         if (!apartment.latitude || !apartment.longitude) return null;
@@ -133,9 +160,16 @@ export default function MapView() {
                                 key={apartment.id}
                                 position={[apartment.latitude, apartment.longitude]}
                                 icon={createPriceIcon(apartment, activeApartmentId === apartment.id)}
+                                ref={(ref) => {
+                                    if (ref) markerRefs.current[apartment.id] = ref;
+                                }}
                                 eventHandlers={{
                                     mouseover: () => setActiveApartmentId(apartment.id),
                                     mouseout: () => setActiveApartmentId(null),
+                                    click: () => {
+                                        setSelectedApartment(apartment);
+                                        setActiveApartmentId(apartment.id);
+                                    },
                                 }}
                             >
                                 <Popup>
