@@ -15,6 +15,7 @@ import AdminBookings from "../pages/AdminBookings";
 import AdminMessages from "../pages/AdminMessages";
 import EditApartment from "../pages/EditApartment";
 import MapView from "../pages/MapView";
+import Favorites from "../pages/Favorites";
 
 export default function AppRouter() {
     return (
@@ -91,6 +92,15 @@ export default function AppRouter() {
                     }
                 />
                 <Route path="/map" element={<MapView />} />
+
+                <Route
+                    path="/favorites"
+                    element={
+                        <ProtectedRoute>
+                            <Favorites />
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
         </BrowserRouter>
     );

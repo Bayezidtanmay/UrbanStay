@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiFetch } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 import Loading from "../components/Loading";
 import BookingForm from "../components/BookingForm";
 import ReviewSection from "../components/ReviewSection";
@@ -10,8 +11,12 @@ import ApartmentMap from "../components/ApartmentMap";
 
 export default function ApartmentDetails() {
     const { id } = useParams();
+    const { user } = useAuth();
+
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
 
     useEffect(() => {
         async function fetchApartment() {
@@ -28,7 +33,47 @@ export default function ApartmentDetails() {
         fetchApartment();
     }, [id]);
 
+    useEffect(() => {
+        async function checkFavorite() {
+            if (!user || !id) return;
+
+            try {
+                const result = await apiFetch(`/favorites/check/${id}`);
+                setIsFavorite(result.is_favorite);
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+
+        checkFavorite();
+    }, [user, id]);
+
+    async function toggleFavorite() {
+        if (!user || !data?.apartment) return;
+
+        try {
+            setFavoriteLoading(true);
+
+            if (isFavorite) {
+                await apiFetch(`/favorites/${data.apartment.id}`, {
+                    method: "DELETE",
+                });
+                setIsFavorite(false);
+            } else {
+                await apiFetch(`/favorites/${data.apartment.id}`, {
+                    method: "POST",
+                });
+                setIsFavorite(true);
+            }
+        } catch (error) {
+            console.error(error.message);
+        } finally {
+            setFavoriteLoading(false);
+        }
+    }
+
     if (loading) return <Loading />;
+
     if (!data?.apartment) {
         return <p className="container page">Apartment not found.</p>;
     }
@@ -38,6 +83,20 @@ export default function ApartmentDetails() {
     return (
         <div className="container page">
             <h1>{apartment.title}</h1>
+
+            {user && (
+                <button
+                    className="btn favorite-btn"
+                    onClick={toggleFavorite}
+                    disabled={favoriteLoading}
+                >
+                    {favoriteLoading
+                        ? "Saving..."
+                        : isFavorite
+                            ? "♥ Remove from Favorites"
+                            : "♡ Save to Favorites"}
+                </button>
+            )}
 
             <ImageSlider
                 featuredImage={apartment.featured_image}

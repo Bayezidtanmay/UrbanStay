@@ -60,4 +60,9 @@ class Apartment extends Model
     {
         return $this->hasMany(UnavailableDate::class);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
 }

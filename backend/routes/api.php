@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ApartmentController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ContactMessageController;
+use App\Http\Controllers\Api\FavoriteController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -38,4 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/contact-messages/{id}', [ContactMessageController::class, 'show']);
         Route::delete('/contact-messages/{id}', [ContactMessageController::class, 'destroy']);
     });
+
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::get('/favorites/check/{apartmentId}', [FavoriteController::class, 'check']);
+    Route::post('/favorites/{apartmentId}', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{apartmentId}', [FavoriteController::class, 'destroy']);
 });

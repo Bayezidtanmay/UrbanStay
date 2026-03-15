@@ -805,3 +805,36 @@
     opacity: 1 !important;
     cursor: not-allowed !important;
   }
+
+  .favorite-btn {
+    margin-bottom: 18px;
+  }
+  
+  .favorite-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .apartment-card {
+    position: relative;
+  }
+  
+  .favorite-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.15s ease;
+  }
+  
+  .favorite-icon:hover {
+    transform: scale(1.15);
+  }
