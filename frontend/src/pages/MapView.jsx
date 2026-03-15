@@ -1,28 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
 import { Link } from "react-router-dom";
+import L from "leaflet";
 import { apiFetch } from "../api/client";
 import MapBoundsUpdater from "../components/MapBoundsUpdater";
 
-function createPriceIcon(apartment) {
+function createPriceIcon(apartment, isActive = false) {
     let parts = [];
 
     if (apartment.price_per_night) {
-        parts.push(`€${apartment.price_per_night}/ni`);
+        parts.push(`€${Math.round(Number(apartment.price_per_night))}/n`);
     }
 
     if (apartment.price_per_month) {
-        parts.push(`€${apartment.price_per_month}/mo`);
+        parts.push(`€${Math.round(Number(apartment.price_per_month))}/m`);
     }
 
     const priceLabel = parts.length > 0 ? parts.join(" • ") : "View";
 
     return L.divIcon({
         className: "custom-price-marker-wrapper",
-        html: `<div class="custom-price-marker">${priceLabel}</div>`,
-        iconSize: [180, 40],
-        iconAnchor: [90, 20],
+        html: `<div class="custom-price-marker ${isActive ? "active-price-marker" : ""}">${priceLabel}</div>`,
+        iconSize: [170, 40],
+        iconAnchor: [85, 20],
         popupAnchor: [0, -18],
     });
 }
@@ -30,6 +30,7 @@ function createPriceIcon(apartment) {
 export default function MapView() {
     const [apartments, setApartments] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [activeApartmentId, setActiveApartmentId] = useState(null);
 
     const fetchApartments = useCallback(async (bounds = null) => {
         try {
@@ -62,13 +63,56 @@ export default function MapView() {
     }, [fetchApartments]);
 
     return (
-        <div className="map-page">
-            <div className="map-header">
-                <h1>Explore Apartments on Map</h1>
-                <p>{loading ? "Updating apartments..." : `${apartments.length} apartments in view`}</p>
+        <div className="map-page-split">
+            <div className="map-list-panel">
+                <div className="map-header map-header-sticky">
+                    <h1>Explore Apartments on Map</h1>
+                    <p>{loading ? "Updating apartments..." : `${apartments.length} apartments in view`}</p>
+                </div>
+
+                <div className="map-list-content">
+                    {apartments.length === 0 ? (
+                        <p>No apartments in this area.</p>
+                    ) : (
+                        apartments.map((apartment) => (
+                            <Link
+                                to={`/apartments/${apartment.id}`}
+                                key={apartment.id}
+                                className={`map-list-card ${activeApartmentId === apartment.id ? "active-map-list-card" : ""}`}
+                                onMouseEnter={() => setActiveApartmentId(apartment.id)}
+                                onMouseLeave={() => setActiveApartmentId(null)}
+                            >
+                                <img
+                                    src={
+                                        apartment.featured_image
+                                            ? apartment.featured_image
+                                            : "https://via.placeholder.com/400x250?text=UrbanStay"
+                                    }
+                                    alt={apartment.title}
+                                    className="map-list-image"
+                                />
+
+                                <div className="map-list-body">
+                                    <h3>{apartment.title}</h3>
+                                    <p>{apartment.location}</p>
+                                    <p>{apartment.address}</p>
+
+                                    <div className="map-list-prices">
+                                        {apartment.price_per_night && (
+                                            <span>€{apartment.price_per_night} / night</span>
+                                        )}
+                                        {apartment.price_per_month && (
+                                            <span>€{apartment.price_per_month} / month</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </Link>
+                        ))
+                    )}
+                </div>
             </div>
 
-            <div className="map-view-wrapper">
+            <div className="map-canvas-panel">
                 <MapContainer
                     center={[60.1699, 24.9384]}
                     zoom={10}
@@ -88,7 +132,11 @@ export default function MapView() {
                             <Marker
                                 key={apartment.id}
                                 position={[apartment.latitude, apartment.longitude]}
-                                icon={createPriceIcon(apartment)}
+                                icon={createPriceIcon(apartment, activeApartmentId === apartment.id)}
+                                eventHandlers={{
+                                    mouseover: () => setActiveApartmentId(apartment.id),
+                                    mouseout: () => setActiveApartmentId(null),
+                                }}
                             >
                                 <Popup>
                                     <div className="map-popup">

@@ -598,3 +598,131 @@
     transform: translateY(-2px);
     box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
   }
+
+  .map-page-split {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    height: calc(100vh - 78px);
+  }
+  
+  .map-list-panel {
+    background: #f8fafc;
+    border-right: 1px solid #e5e7eb;
+    overflow-y: auto;
+  }
+  
+  .map-header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: white;
+  }
+  
+  .map-list-content {
+    padding: 18px;
+    display: grid;
+    gap: 16px;
+  }
+  
+  .map-list-card {
+    display: block;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  
+  .map-list-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  }
+  
+  .active-map-list-card {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+  }
+  
+  .map-list-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .map-list-body {
+    padding: 14px;
+  }
+  
+  .map-list-body h3 {
+    margin-bottom: 8px;
+    color: #111827;
+  }
+  
+  .map-list-body p {
+    margin-bottom: 6px;
+    color: #4b5563;
+  }
+  
+  .map-list-prices {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 10px;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .map-canvas-panel {
+    height: 100%;
+  }
+  
+  .custom-price-marker-wrapper {
+    background: transparent;
+    border: none;
+  }
+  
+  .custom-price-marker {
+    background: white;
+    color: #111827;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease;
+    display: inline-block;
+    max-width: 220px;
+  }
+  
+  .custom-price-marker:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+  }
+  
+  .active-price-marker {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 20px rgba(37, 99, 235, 0.28);
+  }
+  
+  @media (max-width: 1024px) {
+    .map-page-split {
+      grid-template-columns: 1fr;
+      height: auto;
+    }
+  
+    .map-list-panel {
+      border-right: none;
+      border-bottom: 1px solid #e5e7eb;
+      max-height: 45vh;
+    }
+  
+    .map-canvas-panel {
+      height: 55vh;
+    }
+  }
