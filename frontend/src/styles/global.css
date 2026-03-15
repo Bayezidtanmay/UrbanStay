@@ -730,3 +730,41 @@
   .map-card-btn {
     margin-top: 12px;
   }
+
+  .datepicker-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
+  
+  .react-datepicker {
+    font-family: Arial, sans-serif;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+  
+  .react-datepicker__header {
+    background: #2563eb;
+    color: white;
+    border-bottom: none;
+  }
+  
+  .react-datepicker__current-month,
+  .react-datepicker-time__header,
+  .react-datepicker-year-header {
+    color: white;
+  }
+  
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected {
+    background: #2563eb !important;
+    color: white !important;
+    border-radius: 999px;
+  }
+  
+  .react-datepicker__day:hover {
+    border-radius: 999px;
+  }

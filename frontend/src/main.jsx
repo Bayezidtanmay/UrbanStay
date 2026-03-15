@@ -4,6 +4,7 @@ import AppRouter from "./router/AppRouter";
 import { AuthProvider } from "./context/AuthContext";
 import "./styles/global.css";
 import "leaflet/dist/leaflet.css";
+import "react-datepicker/dist/react-datepicker.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
