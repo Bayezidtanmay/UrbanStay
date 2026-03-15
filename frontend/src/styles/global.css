@@ -573,3 +573,28 @@
     margin-bottom: 6px;
     color: #444;
   }
+
+  .custom-price-marker-wrapper {
+    background: transparent;
+    border: none;
+  }
+  
+  .custom-price-marker {
+    background: white;
+    color: #111827;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: inline-block;
+    max-width: 220px;
+  }
+  
+  .custom-price-marker:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.18);
+  }

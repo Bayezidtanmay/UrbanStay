@@ -1,8 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
 import { Link } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import MapBoundsUpdater from "../components/MapBoundsUpdater";
+
+function createPriceIcon(apartment) {
+    let parts = [];
+
+    if (apartment.price_per_night) {
+        parts.push(`€${apartment.price_per_night}/ni`);
+    }
+
+    if (apartment.price_per_month) {
+        parts.push(`€${apartment.price_per_month}/mo`);
+    }
+
+    const priceLabel = parts.length > 0 ? parts.join(" • ") : "View";
+
+    return L.divIcon({
+        className: "custom-price-marker-wrapper",
+        html: `<div class="custom-price-marker">${priceLabel}</div>`,
+        iconSize: [180, 40],
+        iconAnchor: [90, 20],
+        popupAnchor: [0, -18],
+    });
+}
 
 export default function MapView() {
     const [apartments, setApartments] = useState([]);
@@ -65,6 +88,7 @@ export default function MapView() {
                             <Marker
                                 key={apartment.id}
                                 position={[apartment.latitude, apartment.longitude]}
+                                icon={createPriceIcon(apartment)}
                             >
                                 <Popup>
                                     <div className="map-popup">
