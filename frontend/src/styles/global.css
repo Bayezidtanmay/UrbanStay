@@ -967,3 +967,9 @@
     height: 6px;
     border-radius: 999px;
   }
+
+  .filter-auto-note {
+    font-size: 15px;
+    color: #6b7280;
+    margin-top: 10px;
+  }

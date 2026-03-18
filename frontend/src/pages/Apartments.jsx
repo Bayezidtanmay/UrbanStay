@@ -82,6 +82,24 @@ export default function Apartments() {
         fetchApartments(1);
     }, []);
 
+    // Instant auto-search with debounce
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            fetchApartments(1);
+        }, 350);
+
+        return () => clearTimeout(timeout);
+    }, [
+        location,
+        rentalType,
+        bedrooms,
+        bathrooms,
+        availability,
+        sortBy,
+        nightRange,
+        monthRange,
+    ]);
+
     function handleSubmit(e) {
         e.preventDefault();
         fetchApartments(1);
@@ -96,7 +114,6 @@ export default function Apartments() {
         setSortBy("");
         setNightRange([0, 300]);
         setMonthRange([0, 5000]);
-        setTimeout(() => fetchApartments(1), 0);
     }
 
     function goToNextPage() {
@@ -114,6 +131,7 @@ export default function Apartments() {
     return (
         <div className="container page">
             <h1>Apartments</h1>
+            <p className="filter-auto-note">Filters update automatically as you adjust them.</p>
 
             <form className="filter-form advanced-filter-form" onSubmit={handleSubmit}>
                 <input
