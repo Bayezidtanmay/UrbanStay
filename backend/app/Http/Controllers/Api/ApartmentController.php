@@ -70,6 +70,21 @@ class ApartmentController extends Controller
             });
         }
 
+        if ($request->filled('bedrooms')) {
+            $query->where('bedrooms', '>=', (int) $request->bedrooms);
+        }
+
+        if ($request->filled('bathrooms')) {
+            $query->where('bathrooms', '>=', (int) $request->bathrooms);
+        }
+
+        if ($request->filled('is_available')) {
+            $isAvailable = filter_var($request->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if (! is_null($isAvailable)) {
+                $query->where('is_available', $isAvailable);
+            }
+        }
+
         if (
             $request->filled('lat_min') &&
             $request->filled('lat_max') &&
@@ -80,6 +95,21 @@ class ApartmentController extends Controller
                 ->whereNotNull('longitude')
                 ->whereBetween('latitude', [(float) $request->lat_min, (float) $request->lat_max])
                 ->whereBetween('longitude', [(float) $request->lng_min, (float) $request->lng_max]);
+        }
+
+        $sortBy = $request->get('sort_by');
+        $sortOrder = $request->get('sort_order', 'asc');
+
+        if ($sortBy === 'night_price') {
+            $query->orderBy('price_per_night', $sortOrder);
+        } elseif ($sortBy === 'month_price') {
+            $query->orderBy('price_per_month', $sortOrder);
+        } elseif ($sortBy === 'bedrooms') {
+            $query->orderBy('bedrooms', $sortOrder);
+        } elseif ($sortBy === 'newest') {
+            $query->orderBy('created_at', 'desc');
+        } elseif ($sortBy === 'oldest') {
+            $query->orderBy('created_at', 'asc');
         }
 
         $apartments = $query->paginate(20);

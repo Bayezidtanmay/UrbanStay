@@ -15,6 +15,10 @@ export default function Apartments() {
     const [rentalType, setRentalType] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
+    const [bedrooms, setBedrooms] = useState("");
+    const [bathrooms, setBathrooms] = useState("");
+    const [availability, setAvailability] = useState("");
+    const [sortBy, setSortBy] = useState("");
 
     async function fetchApartments(pageNumber = 1) {
         try {
@@ -22,16 +26,40 @@ export default function Apartments() {
             setError("");
 
             const params = new URLSearchParams();
-
             params.append("page", pageNumber);
 
             if (location.trim()) params.append("location", location.trim());
             if (rentalType) params.append("rental_type", rentalType);
             if (minPrice) params.append("min_price", minPrice);
             if (maxPrice) params.append("max_price", maxPrice);
+            if (bedrooms) params.append("bedrooms", bedrooms);
+            if (bathrooms) params.append("bathrooms", bathrooms);
+            if (availability) params.append("is_available", availability);
+
+            if (sortBy) {
+                if (sortBy === "night_price_asc") {
+                    params.append("sort_by", "night_price");
+                    params.append("sort_order", "asc");
+                } else if (sortBy === "night_price_desc") {
+                    params.append("sort_by", "night_price");
+                    params.append("sort_order", "desc");
+                } else if (sortBy === "month_price_asc") {
+                    params.append("sort_by", "month_price");
+                    params.append("sort_order", "asc");
+                } else if (sortBy === "month_price_desc") {
+                    params.append("sort_by", "month_price");
+                    params.append("sort_order", "desc");
+                } else if (sortBy === "bedrooms_desc") {
+                    params.append("sort_by", "bedrooms");
+                    params.append("sort_order", "desc");
+                } else if (sortBy === "newest") {
+                    params.append("sort_by", "newest");
+                } else if (sortBy === "oldest") {
+                    params.append("sort_by", "oldest");
+                }
+            }
 
             const endpoint = `/apartments?${params.toString()}`;
-
             const data = await apiFetch(endpoint);
 
             setApartments(data.data || []);
@@ -53,6 +81,18 @@ export default function Apartments() {
         fetchApartments(1);
     }
 
+    function handleReset() {
+        setLocation("");
+        setRentalType("");
+        setMinPrice("");
+        setMaxPrice("");
+        setBedrooms("");
+        setBathrooms("");
+        setAvailability("");
+        setSortBy("");
+        setTimeout(() => fetchApartments(1), 0);
+    }
+
     function goToNextPage() {
         if (page < lastPage) {
             fetchApartments(page + 1);
@@ -69,7 +109,7 @@ export default function Apartments() {
         <div className="container page">
             <h1>Apartments</h1>
 
-            <form className="filter-form" onSubmit={handleSubmit}>
+            <form className="filter-form advanced-filter-form" onSubmit={handleSubmit}>
                 <input
                     type="text"
                     placeholder="Search by location"
@@ -101,9 +141,63 @@ export default function Apartments() {
                     onChange={(e) => setMaxPrice(e.target.value)}
                 />
 
-                <button type="submit" className="btn">
-                    Search
-                </button>
+                <select
+                    value={bedrooms}
+                    onChange={(e) => setBedrooms(e.target.value)}
+                >
+                    <option value="">Any bedrooms</option>
+                    <option value="1">1+ bedrooms</option>
+                    <option value="2">2+ bedrooms</option>
+                    <option value="3">3+ bedrooms</option>
+                    <option value="4">4+ bedrooms</option>
+                </select>
+
+                <select
+                    value={bathrooms}
+                    onChange={(e) => setBathrooms(e.target.value)}
+                >
+                    <option value="">Any bathrooms</option>
+                    <option value="1">1+ bathrooms</option>
+                    <option value="2">2+ bathrooms</option>
+                    <option value="3">3+ bathrooms</option>
+                </select>
+
+                <select
+                    value={availability}
+                    onChange={(e) => setAvailability(e.target.value)}
+                >
+                    <option value="">All availability</option>
+                    <option value="true">Available only</option>
+                    <option value="false">Unavailable only</option>
+                </select>
+
+                <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                >
+                    <option value="">Default sorting</option>
+                    <option value="night_price_asc">Night price: low to high</option>
+                    <option value="night_price_desc">Night price: high to low</option>
+                    <option value="month_price_asc">Month price: low to high</option>
+                    <option value="month_price_desc">Month price: high to low</option>
+                    <option value="bedrooms_desc">Most bedrooms</option>
+                    <option value="newest">Newest first</option>
+                    <option value="oldest">Oldest first</option>
+                </select>
+
+                <div className="filter-actions">
+                    <button type="submit" className="btn">
+                        Search
+                    </button>
+
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleReset}
+                    >
+                        Reset
+                    </button>
+                </div>
             </form>
 
             {loading ? (

@@ -903,3 +903,18 @@
     background: #fee2e2;
     color: #991b1b;
   }
+
+  .advanced-filter-form {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    align-items: end;
+  }
+  
+  .filter-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .btn-secondary {
+    background: #6b7280;
+  }
