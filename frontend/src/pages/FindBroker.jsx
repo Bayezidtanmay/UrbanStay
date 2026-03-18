@@ -1,112 +1,81 @@
-import { useMemo, useState } from "react";
-
-const brokers = [
-    {
-        id: 1,
-        name: "Anna Lehtinen",
-        area: "Helsinki",
-        specialty: "City apartments & short stays",
-        languages: ["English", "Finnish"],
-        phone: "+358 40 123 4567",
-        email: "anna@urbanstay.fi",
-        image:
-            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80",
-        description:
-            "Anna helps clients find modern apartments in central Helsinki, especially for short-term stays and remote workers.",
-    },
-    {
-        id: 2,
-        name: "Mikko Saarinen",
-        area: "Espoo",
-        specialty: "Family homes & monthly rentals",
-        languages: ["English", "Finnish", "Swedish"],
-        phone: "+358 50 234 5678",
-        email: "mikko@urbanstay.fi",
-        image:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
-        description:
-            "Mikko focuses on family-friendly apartments and long-term monthly rentals in Espoo and nearby areas.",
-    },
-    {
-        id: 3,
-        name: "Sofia Niemi",
-        area: "Vantaa",
-        specialty: "Affordable rentals & student housing",
-        languages: ["English", "Finnish"],
-        phone: "+358 45 345 6789",
-        email: "sofia@urbanstay.fi",
-        image:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=800&q=80",
-        description:
-            "Sofia helps students and young professionals find affordable apartments with good transport connections.",
-    },
-    {
-        id: 4,
-        name: "Joonas Virtanen",
-        area: "Tampere",
-        specialty: "Budget studios & first-time renters",
-        languages: ["English", "Finnish"],
-        phone: "+358 44 456 7890",
-        email: "joonas@urbanstay.fi",
-        image:
-            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80",
-        description:
-            "Joonas specializes in practical and affordable options for people moving into a new city for work or study.",
-    },
-    {
-        id: 5,
-        name: "Emilia Koski",
-        area: "Turku",
-        specialty: "Premium apartments & relocation support",
-        languages: ["English", "Finnish", "German"],
-        phone: "+358 41 567 8901",
-        email: "emilia@urbanstay.fi",
-        image:
-            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=800&q=80",
-        description:
-            "Emilia assists clients looking for high-quality apartments and relocation support in Turku.",
-    },
-    {
-        id: 6,
-        name: "Lauri Hämäläinen",
-        area: "Oulu",
-        specialty: "Long stays & furnished apartments",
-        languages: ["English", "Finnish"],
-        phone: "+358 46 678 9012",
-        email: "lauri@urbanstay.fi",
-        image:
-            "https://images.unsplash.com/photo-1504593811423-6dd665756598?auto=format&fit=crop&w=800&q=80",
-        description:
-            "Lauri helps professionals and students find furnished apartments for longer stays in Oulu.",
-    },
-];
+import { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 export default function FindBroker() {
+    const { user } = useAuth();
+
+    const [brokers, setBrokers] = useState([]);
     const [search, setSearch] = useState("");
     const [area, setArea] = useState("");
+    const [selectedBroker, setSelectedBroker] = useState(null);
 
-    const areas = [...new Set(brokers.map((broker) => broker.area))];
+    const [form, setForm] = useState({
+        name: user?.name || "",
+        email: user?.email || "",
+        message: "",
+    });
 
-    const filteredBrokers = useMemo(() => {
-        return brokers.filter((broker) => {
-            const matchesSearch =
-                broker.name.toLowerCase().includes(search.toLowerCase()) ||
-                broker.area.toLowerCase().includes(search.toLowerCase()) ||
-                broker.specialty.toLowerCase().includes(search.toLowerCase());
+    const [success, setSuccess] = useState("");
+    const [error, setError] = useState("");
 
-            const matchesArea = area ? broker.area === area : true;
+    async function fetchBrokers() {
+        try {
+            const params = new URLSearchParams();
+            if (search) params.append("search", search);
+            if (area) params.append("area", area);
 
-            return matchesSearch && matchesArea;
-        });
+            const endpoint = params.toString()
+                ? `/brokers?${params.toString()}`
+                : "/brokers";
+
+            const data = await apiFetch(endpoint);
+            setBrokers(data || []);
+        } catch (err) {
+            setError(err.message || "Failed to load brokers.");
+        }
+    }
+
+    useEffect(() => {
+        fetchBrokers();
     }, [search, area]);
+
+    const areas = useMemo(
+        () => [...new Set(brokers.map((broker) => broker.area))],
+        [brokers]
+    );
+
+    async function sendMessage(e) {
+        e.preventDefault();
+        if (!selectedBroker) return;
+
+        try {
+            setSuccess("");
+            setError("");
+
+            const data = await apiFetch(`/brokers/${selectedBroker.id}/message`, {
+                method: "POST",
+                body: JSON.stringify(form),
+            });
+
+            setSuccess(data.message || "Message sent successfully.");
+            setForm({
+                name: user?.name || "",
+                email: user?.email || "",
+                message: "",
+            });
+        } catch (err) {
+            setError(err.message || "Failed to send message.");
+        }
+    }
 
     return (
         <div className="container page">
             <section className="broker-hero">
                 <h1>Find a Broker</h1>
                 <p>
-                    Need help finding the right apartment? Our local brokers can guide you
-                    based on city, budget, rental type, and lifestyle.
+                    Connect with local brokers who can help you find the right apartment
+                    based on area, budget, and rental type.
                 </p>
             </section>
 
@@ -128,24 +97,17 @@ export default function FindBroker() {
                 </select>
             </section>
 
-            <section className="broker-info-box">
-                <h2>How brokers can help</h2>
-                <ul className="broker-help-list">
-                    <li>Recommend apartments based on your preferred area and budget</li>
-                    <li>Help you compare nightly and monthly rental options</li>
-                    <li>Answer questions about transport, neighborhood, and move-in process</li>
-                    <li>Support international renters with practical guidance</li>
-                </ul>
-            </section>
-
             <section className="broker-grid">
-                {filteredBrokers.length === 0 ? (
-                    <p>No brokers found for your search.</p>
+                {brokers.length === 0 ? (
+                    <p>No brokers found.</p>
                 ) : (
-                    filteredBrokers.map((broker) => (
+                    brokers.map((broker) => (
                         <div key={broker.id} className="broker-card">
                             <img
-                                src={broker.image}
+                                src={
+                                    broker.image ||
+                                    "https://via.placeholder.com/500x300?text=Broker"
+                                }
                                 alt={broker.name}
                                 className="broker-image"
                             />
@@ -159,31 +121,83 @@ export default function FindBroker() {
                                 <p className="broker-specialty">{broker.specialty}</p>
                                 <p className="broker-description">{broker.description}</p>
 
-                                <p>
-                                    <strong>Languages:</strong> {broker.languages.join(", ")}
-                                </p>
-                                <p>
-                                    <strong>Phone:</strong>{" "}
-                                    <a href={`tel:${broker.phone}`}>{broker.phone}</a>
-                                </p>
-                                <p>
-                                    <strong>Email:</strong>{" "}
-                                    <a href={`mailto:${broker.email}`}>{broker.email}</a>
-                                </p>
+                                <p><strong>Languages:</strong> {broker.languages || "Not specified"}</p>
+                                <p><strong>Phone:</strong> <a href={`tel:${broker.phone}`}>{broker.phone}</a></p>
+                                <p><strong>Email:</strong> <a href={`mailto:${broker.email}`}>{broker.email}</a></p>
 
                                 <div className="broker-actions">
                                     <a href={`mailto:${broker.email}`} className="btn">
-                                        Message Broker
+                                        Email Broker
                                     </a>
+
                                     <a href={`tel:${broker.phone}`} className="btn btn-secondary">
                                         Call Broker
                                     </a>
+
+                                    <button
+                                        className="btn"
+                                        type="button"
+                                        onClick={() => setSelectedBroker(broker)}
+                                    >
+                                        Message Broker
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     ))
                 )}
             </section>
+
+            {selectedBroker && (
+                <div className="broker-modal-overlay" onClick={() => setSelectedBroker(null)}>
+                    <div
+                        className="broker-modal"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2>Message {selectedBroker.name}</h2>
+
+                        <form className="auth-form" onSubmit={sendMessage}>
+                            <input
+                                type="text"
+                                placeholder="Your name"
+                                value={form.name}
+                                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                            />
+
+                            <input
+                                type="email"
+                                placeholder="Your email"
+                                value={form.email}
+                                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            />
+
+                            <textarea
+                                rows="5"
+                                placeholder="Write your message"
+                                value={form.message}
+                                onChange={(e) => setForm({ ...form, message: e.target.value })}
+                            />
+
+                            {success && <p className="success-text">{success}</p>}
+                            {error && <p className="error-text">{error}</p>}
+
+                            <div className="broker-actions">
+                                <button type="submit" className="btn">
+                                    Send Message
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setSelectedBroker(null)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
