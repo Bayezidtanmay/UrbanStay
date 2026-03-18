@@ -918,3 +918,52 @@
   .btn-secondary {
     background: #6b7280;
   }
+
+  .slider-filter-block {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  
+  .slider-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #111827;
+  }
+  
+  .rc-slider {
+    margin: 6px 0 10px;
+  }
+  
+  .rc-slider-track {
+    background-color: #2563eb;
+  }
+  
+  .rc-slider-handle {
+    border: 2px solid #2563eb;
+    background-color: #ffffff;
+    opacity: 1;
+    width: 18px;
+    height: 18px;
+    margin-top: -7px;
+  }
+  
+  .rc-slider-handle:hover,
+  .rc-slider-handle:active,
+  .rc-slider-handle:focus {
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  }
+  
+  .rc-slider-rail {
+    background-color: #d1d5db;
+    height: 6px;
+  }
+  
+  .rc-slider-track,
+  .rc-slider-rail {
+    height: 6px;
+    border-radius: 999px;
+  }

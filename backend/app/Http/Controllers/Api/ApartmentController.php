@@ -56,18 +56,24 @@ class ApartmentController extends Controller
             }
         }
 
-        if ($request->filled('min_price')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('price_per_night', '>=', $request->min_price)
-                    ->orWhere('price_per_month', '>=', $request->min_price);
-            });
+        if ($request->filled('night_min')) {
+            $query->whereNotNull('price_per_night')
+                ->where('price_per_night', '>=', (float) $request->night_min);
         }
 
-        if ($request->filled('max_price')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('price_per_night', '<=', $request->max_price)
-                    ->orWhere('price_per_month', '<=', $request->max_price);
-            });
+        if ($request->filled('night_max')) {
+            $query->whereNotNull('price_per_night')
+                ->where('price_per_night', '<=', (float) $request->night_max);
+        }
+
+        if ($request->filled('month_min')) {
+            $query->whereNotNull('price_per_month')
+                ->where('price_per_month', '>=', (float) $request->month_min);
+        }
+
+        if ($request->filled('month_max')) {
+            $query->whereNotNull('price_per_month')
+                ->where('price_per_month', '<=', (float) $request->month_max);
         }
 
         if ($request->filled('bedrooms')) {

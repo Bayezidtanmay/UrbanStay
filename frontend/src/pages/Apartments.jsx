@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 import { apiFetch } from "../api/client";
 import ApartmentCard from "../components/ApartmentCard";
 import Loading from "../components/Loading";
@@ -13,12 +15,13 @@ export default function Apartments() {
 
     const [location, setLocation] = useState("");
     const [rentalType, setRentalType] = useState("");
-    const [minPrice, setMinPrice] = useState("");
-    const [maxPrice, setMaxPrice] = useState("");
     const [bedrooms, setBedrooms] = useState("");
     const [bathrooms, setBathrooms] = useState("");
     const [availability, setAvailability] = useState("");
     const [sortBy, setSortBy] = useState("");
+
+    const [nightRange, setNightRange] = useState([0, 300]);
+    const [monthRange, setMonthRange] = useState([0, 5000]);
 
     async function fetchApartments(pageNumber = 1) {
         try {
@@ -30,11 +33,14 @@ export default function Apartments() {
 
             if (location.trim()) params.append("location", location.trim());
             if (rentalType) params.append("rental_type", rentalType);
-            if (minPrice) params.append("min_price", minPrice);
-            if (maxPrice) params.append("max_price", maxPrice);
             if (bedrooms) params.append("bedrooms", bedrooms);
             if (bathrooms) params.append("bathrooms", bathrooms);
             if (availability) params.append("is_available", availability);
+
+            params.append("night_min", nightRange[0]);
+            params.append("night_max", nightRange[1]);
+            params.append("month_min", monthRange[0]);
+            params.append("month_max", monthRange[1]);
 
             if (sortBy) {
                 if (sortBy === "night_price_asc") {
@@ -84,12 +90,12 @@ export default function Apartments() {
     function handleReset() {
         setLocation("");
         setRentalType("");
-        setMinPrice("");
-        setMaxPrice("");
         setBedrooms("");
         setBathrooms("");
         setAvailability("");
         setSortBy("");
+        setNightRange([0, 300]);
+        setMonthRange([0, 5000]);
         setTimeout(() => fetchApartments(1), 0);
     }
 
@@ -126,20 +132,6 @@ export default function Apartments() {
                     <option value="monthly">Monthly</option>
                     <option value="both">Both</option>
                 </select>
-
-                <input
-                    type="number"
-                    placeholder="Min price"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                />
-
-                <input
-                    type="number"
-                    placeholder="Max price"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                />
 
                 <select
                     value={bedrooms}
@@ -184,6 +176,36 @@ export default function Apartments() {
                     <option value="newest">Newest first</option>
                     <option value="oldest">Oldest first</option>
                 </select>
+
+                <div className="slider-filter-block">
+                    <label className="slider-label">
+                        Nightly Price: €{nightRange[0]} - €{nightRange[1]}
+                    </label>
+                    <Slider
+                        range
+                        min={0}
+                        max={300}
+                        step={5}
+                        value={nightRange}
+                        onChange={setNightRange}
+                        allowCross={false}
+                    />
+                </div>
+
+                <div className="slider-filter-block">
+                    <label className="slider-label">
+                        Monthly Price: €{monthRange[0]} - €{monthRange[1]}
+                    </label>
+                    <Slider
+                        range
+                        min={0}
+                        max={5000}
+                        step={50}
+                        value={monthRange}
+                        onChange={setMonthRange}
+                        allowCross={false}
+                    />
+                </div>
 
                 <div className="filter-actions">
                     <button type="submit" className="btn">
