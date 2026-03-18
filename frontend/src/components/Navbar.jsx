@@ -22,6 +22,7 @@ export default function Navbar() {
                     <Link to="/apartments">Apartments</Link>
                     <Link to="/map">Map View</Link>
                     <Link to="/favorites">Favorites</Link>
+                    <Link to="/find-broker">Find a Broker</Link>
 
 
                     {!user && (

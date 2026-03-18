@@ -16,6 +16,7 @@ import AdminMessages from "../pages/AdminMessages";
 import EditApartment from "../pages/EditApartment";
 import MapView from "../pages/MapView";
 import Favorites from "../pages/Favorites";
+import FindBroker from "../pages/FindBroker";
 
 export default function AppRouter() {
     return (
@@ -101,6 +102,7 @@ export default function AppRouter() {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="/find-broker" element={<FindBroker />} />
             </Routes>
         </BrowserRouter>
     );
