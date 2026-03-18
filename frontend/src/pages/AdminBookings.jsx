@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
+import BookingStatusBadge from "../components/BookingStatusBadge";
 
 export default function AdminBookings() {
     const [bookings, setBookings] = useState([]);
@@ -47,7 +48,10 @@ export default function AdminBookings() {
 
     return (
         <div className="container page">
-            <h1>Manage Bookings</h1>
+            <div className="section-header">
+                <h1>Manage Bookings</h1>
+                <p>{bookings.length} booking{bookings.length !== 1 ? "s" : ""}</p>
+            </div>
 
             {message && <p className="success-text">{message}</p>}
             {error && <p className="error-text">{error}</p>}
@@ -57,16 +61,24 @@ export default function AdminBookings() {
             ) : (
                 <div className="booking-list">
                     {bookings.map((booking) => (
-                        <div key={booking.id} className="booking-item">
-                            <h3>{booking.apartment?.title}</h3>
-                            <p><strong>User:</strong> {booking.user?.name}</p>
-                            <p><strong>Email:</strong> {booking.user?.email}</p>
-                            <p><strong>Location:</strong> {booking.apartment?.location}</p>
-                            <p><strong>Booking Type:</strong> {booking.booking_type}</p>
-                            <p><strong>Start Date:</strong> {booking.start_date}</p>
-                            <p><strong>End Date:</strong> {booking.end_date}</p>
-                            <p><strong>Total Price:</strong> €{booking.total_price}</p>
-                            <p><strong>Status:</strong> {booking.status}</p>
+                        <div key={booking.id} className="booking-item booking-card">
+                            <div className="booking-top">
+                                <div>
+                                    <h3>{booking.apartment?.title}</h3>
+                                    <p className="muted-text">{booking.apartment?.location}</p>
+                                </div>
+
+                                <BookingStatusBadge status={booking.status} />
+                            </div>
+
+                            <div className="booking-grid">
+                                <p><strong>User:</strong> {booking.user?.name}</p>
+                                <p><strong>Email:</strong> {booking.user?.email}</p>
+                                <p><strong>Booking Type:</strong> {booking.booking_type}</p>
+                                <p><strong>Start Date:</strong> {booking.start_date}</p>
+                                <p><strong>End Date:</strong> {booking.end_date}</p>
+                                <p><strong>Total Price:</strong> €{booking.total_price}</p>
+                            </div>
 
                             <div className="admin-actions">
                                 <button

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
+import BookingStatusBadge from "../components/BookingStatusBadge";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -44,9 +45,7 @@ export default function Dashboard() {
         }
     }
 
-    if (loading) {
-        return <Loading />;
-    }
+    if (loading) return <Loading />;
 
     return (
         <div className="container page">
@@ -60,7 +59,10 @@ export default function Dashboard() {
             </div>
 
             <div className="details-card section-card">
-                <h2>My Bookings</h2>
+                <div className="section-header">
+                    <h2>My Bookings</h2>
+                    <p>{bookings.length} booking{bookings.length !== 1 ? "s" : ""}</p>
+                </div>
 
                 {message && <p className="success-text">{message}</p>}
                 {error && <p className="error-text">{error}</p>}
@@ -70,22 +72,32 @@ export default function Dashboard() {
                 ) : (
                     <div className="booking-list">
                         {bookings.map((booking) => (
-                            <div key={booking.id} className="booking-item">
-                                <h3>{booking.apartment?.title}</h3>
-                                <p><strong>Location:</strong> {booking.apartment?.location}</p>
-                                <p><strong>Booking Type:</strong> {booking.booking_type}</p>
-                                <p><strong>Start Date:</strong> {booking.start_date}</p>
-                                <p><strong>End Date:</strong> {booking.end_date}</p>
-                                <p><strong>Total Price:</strong> €{booking.total_price}</p>
-                                <p><strong>Status:</strong> {booking.status}</p>
+                            <div key={booking.id} className="booking-item booking-card">
+                                <div className="booking-top">
+                                    <div>
+                                        <h3>{booking.apartment?.title}</h3>
+                                        <p className="muted-text">{booking.apartment?.location}</p>
+                                    </div>
+
+                                    <BookingStatusBadge status={booking.status} />
+                                </div>
+
+                                <div className="booking-grid">
+                                    <p><strong>Booking Type:</strong> {booking.booking_type}</p>
+                                    <p><strong>Start Date:</strong> {booking.start_date}</p>
+                                    <p><strong>End Date:</strong> {booking.end_date}</p>
+                                    <p><strong>Total Price:</strong> €{booking.total_price}</p>
+                                </div>
 
                                 {booking.status !== "cancelled" && (
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={() => handleCancelBooking(booking.id)}
-                                    >
-                                        Cancel Booking
-                                    </button>
+                                    <div className="booking-actions">
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={() => handleCancelBooking(booking.id)}
+                                        >
+                                            Cancel Booking
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         ))}
