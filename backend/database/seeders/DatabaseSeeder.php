@@ -11,5 +11,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ApartmentSeeder::class,
         ]);
+
+        $this->call([
+            BrokerSeeder::class,
+        ]);
     }
 }
