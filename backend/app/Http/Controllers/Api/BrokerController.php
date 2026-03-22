@@ -23,7 +23,10 @@ class BrokerController extends Controller
         }
 
         if ($request->filled('area')) {
-            $query->where('area', $request->area);
+            $query->where(function ($q) use ($request) {
+                $q->where('area', $request->area)
+                    ->orWhereJsonContains('service_areas', $request->area);
+            });
         }
 
         return response()->json($query->get());
@@ -47,11 +50,26 @@ class BrokerController extends Controller
         return response()->json($broker);
     }
 
+    public function recommendedByArea($area)
+    {
+        $brokers = Broker::where('is_active', true)
+            ->where(function ($q) use ($area) {
+                $q->where('area', $area)
+                    ->orWhereJsonContains('service_areas', $area);
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($brokers);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'area' => ['required', 'string', 'max:255'],
+            'service_areas' => ['nullable', 'array'],
+            'service_areas.*' => ['string', 'max:255'],
             'specialty' => ['required', 'string', 'max:255'],
             'languages' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
@@ -70,6 +88,7 @@ class BrokerController extends Controller
         $broker = Broker::create([
             'name' => $validated['name'],
             'area' => $validated['area'],
+            'service_areas' => $validated['service_areas'] ?? [],
             'specialty' => $validated['specialty'],
             'languages' => $validated['languages'] ?? null,
             'phone' => $validated['phone'],
@@ -98,6 +117,8 @@ class BrokerController extends Controller
         $validated = $request->validate([
             'name' => ['sometimes', 'string', 'max:255'],
             'area' => ['sometimes', 'string', 'max:255'],
+            'service_areas' => ['nullable', 'array'],
+            'service_areas.*' => ['string', 'max:255'],
             'specialty' => ['sometimes', 'string', 'max:255'],
             'languages' => ['nullable', 'string', 'max:255'],
             'phone' => ['sometimes', 'string', 'max:255'],

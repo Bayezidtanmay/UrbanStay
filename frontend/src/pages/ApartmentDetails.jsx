@@ -8,6 +8,7 @@ import ReviewSection from "../components/ReviewSection";
 import ContactBrokerForm from "../components/ContactBrokerForm";
 import ImageSlider from "../components/ImageSlider";
 import ApartmentMap from "../components/ApartmentMap";
+import RecommendedBrokers from "../components/RecommendedBrokers";
 
 export default function ApartmentDetails() {
     const { id } = useParams();
@@ -130,6 +131,8 @@ export default function ApartmentDetails() {
                 longitude={apartment.longitude}
                 title={apartment.title}
             />
+
+            <RecommendedBrokers area={apartment.location} />
 
             <BookingForm
                 apartmentId={apartment.id}

@@ -12,6 +12,7 @@ class Broker extends Model
     protected $fillable = [
         'name',
         'area',
+        'service_areas',
         'specialty',
         'languages',
         'phone',
@@ -23,6 +24,7 @@ class Broker extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'service_areas' => 'array',
     ];
 
     public function messages()

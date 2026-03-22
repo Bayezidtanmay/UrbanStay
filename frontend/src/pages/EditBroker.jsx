@@ -10,6 +10,7 @@ export default function EditBroker() {
     const [form, setForm] = useState({
         name: "",
         area: "",
+        service_areas: "",
         specialty: "",
         languages: "",
         phone: "",
@@ -37,6 +38,9 @@ export default function EditBroker() {
                 setForm({
                     name: data.name || "",
                     area: data.area || "",
+                    service_areas: Array.isArray(data.service_areas)
+                        ? data.service_areas.join(", ")
+                        : "",
                     specialty: data.specialty || "",
                     languages: data.languages || "",
                     phone: data.phone || "",
@@ -92,6 +96,15 @@ export default function EditBroker() {
             formData.append("description", form.description);
             formData.append("is_active", form.is_active ? "1" : "0");
 
+            const serviceAreasArray = form.service_areas
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+            serviceAreasArray.forEach((area, index) => {
+                formData.append(`service_areas[${index}]`, area);
+            });
+
             if (form.image) {
                 formData.append("image", form.image);
             }
@@ -123,8 +136,17 @@ export default function EditBroker() {
                 <label>Name</label>
                 <input type="text" name="name" value={form.name} onChange={handleChange} />
 
-                <label>Area</label>
+                <label>Main Area</label>
                 <input type="text" name="area" value={form.area} onChange={handleChange} />
+
+                <label>Service Areas (comma separated)</label>
+                <input
+                    type="text"
+                    name="service_areas"
+                    value={form.service_areas}
+                    onChange={handleChange}
+                    placeholder="Helsinki, Espoo, Vantaa"
+                />
 
                 <label>Specialty</label>
                 <input type="text" name="specialty" value={form.specialty} onChange={handleChange} />

@@ -20,6 +20,7 @@ Route::post('/apartments/{id}/contact', [ContactMessageController::class, 'store
 Route::get('/brokers', [BrokerController::class, 'index']);
 Route::get('/brokers/{id}', [BrokerController::class, 'show']);
 Route::post('/brokers/{brokerId}/message', [BrokerMessageController::class, 'store']);
+Route::get('/brokers/recommended/{area}', [BrokerController::class, 'recommendedByArea']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
