@@ -1188,3 +1188,18 @@
   .profile-bio-box h3 {
     margin-bottom: 8px;
   }
+
+  .navbar-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+  }
+  
+  .navbar-avatar {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+  }

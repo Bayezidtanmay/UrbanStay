@@ -24,7 +24,6 @@ export default function Navbar() {
                     <Link to="/favorites">Favorites</Link>
                     <Link to="/find-broker">Find a Broker</Link>
 
-
                     {!user && (
                         <>
                             <Link to="/login">Login</Link>
@@ -35,11 +34,20 @@ export default function Navbar() {
                     {user && (
                         <>
                             <Link to="/dashboard">Dashboard</Link>
-                            {isAdmin && (
-                                <Link to="/admin">Admin</Link>
-                            )}
-                            <span className="welcome">Hi, {user.name}</span>
-                            {isAdmin && <span className="admin-badge">Admin</span>}
+                            {isAdmin && <Link to="/admin">Admin</Link>}
+
+                            <Link to="/profile/edit" className="navbar-user">
+                                <img
+                                    src={
+                                        user.profile_photo ||
+                                        "https://via.placeholder.com/80x80?text=U"
+                                    }
+                                    alt={user.name}
+                                    className="navbar-avatar"
+                                />
+                                <span>Hi, {user.name}</span>
+                            </Link>
+
                             <button onClick={handleLogout} className="btn btn-small">
                                 Logout
                             </button>
