@@ -17,6 +17,10 @@ import EditApartment from "../pages/EditApartment";
 import MapView from "../pages/MapView";
 import Favorites from "../pages/Favorites";
 import FindBroker from "../pages/FindBroker";
+import AdminBrokers from "../pages/AdminBrokers";
+import CreateBroker from "../pages/CreateBroker";
+import EditBroker from "../pages/EditBroker";
+import AdminBrokerMessages from "../pages/AdminBrokerMessages";
 
 export default function AppRouter() {
     return (
@@ -103,6 +107,42 @@ export default function AppRouter() {
                     }
                 />
                 <Route path="/find-broker" element={<FindBroker />} />
+
+                <Route
+                    path="/admin/brokers"
+                    element={
+                        <AdminRoute>
+                            <AdminBrokers />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/brokers/create"
+                    element={
+                        <AdminRoute>
+                            <CreateBroker />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/brokers/edit/:id"
+                    element={
+                        <AdminRoute>
+                            <EditBroker />
+                        </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/admin/broker-messages"
+                    element={
+                        <AdminRoute>
+                            <AdminBrokerMessages />
+                        </AdminRoute>
+                    }
+                />
             </Routes>
         </BrowserRouter>
     );
