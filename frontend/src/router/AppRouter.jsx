@@ -21,6 +21,7 @@ import AdminBrokers from "../pages/AdminBrokers";
 import CreateBroker from "../pages/CreateBroker";
 import EditBroker from "../pages/EditBroker";
 import AdminBrokerMessages from "../pages/AdminBrokerMessages";
+import EditProfile from "../pages/EditProfile";
 
 export default function AppRouter() {
     return (
@@ -141,6 +142,15 @@ export default function AppRouter() {
                         <AdminRoute>
                             <AdminBrokerMessages />
                         </AdminRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile/edit"
+                    element={
+                        <ProtectedRoute>
+                            <EditProfile />
+                        </ProtectedRoute>
                     }
                 />
             </Routes>

@@ -1,32 +1,37 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
 import BookingStatusBadge from "../components/BookingStatusBadge";
 
 export default function Dashboard() {
-    const { user } = useAuth();
+    const [profile, setProfile] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
 
-    async function fetchBookings() {
+    async function fetchDashboardData() {
         try {
             setLoading(true);
             setError("");
 
-            const data = await apiFetch("/bookings");
-            setBookings(data.data || []);
+            const [profileData, bookingsData] = await Promise.all([
+                apiFetch("/profile"),
+                apiFetch("/bookings"),
+            ]);
+
+            setProfile(profileData);
+            setBookings(bookingsData.data || []);
         } catch (err) {
-            setError(err.message || "Failed to load bookings.");
+            setError(err.message || "Failed to load dashboard.");
         } finally {
             setLoading(false);
         }
     }
 
     useEffect(() => {
-        fetchBookings();
+        fetchDashboardData();
     }, []);
 
     async function handleCancelBooking(id) {
@@ -39,7 +44,7 @@ export default function Dashboard() {
             });
 
             setMessage(data.message || "Booking cancelled successfully.");
-            fetchBookings();
+            fetchDashboardData();
         } catch (err) {
             setError(err.message || "Failed to cancel booking.");
         }
@@ -51,11 +56,38 @@ export default function Dashboard() {
         <div className="container page">
             <h1>My Dashboard</h1>
 
-            <div className="details-card section-card">
-                <h2>Account Info</h2>
-                <p><strong>Name:</strong> {user?.name}</p>
-                <p><strong>Email:</strong> {user?.email}</p>
-                <p><strong>Role:</strong> {user?.role}</p>
+            {error && <p className="error-text">{error}</p>}
+
+            <div className="details-card section-card profile-card">
+                <div className="profile-card-top">
+                    <div className="profile-card-left">
+                        <img
+                            src={
+                                profile?.profile_photo ||
+                                "https://via.placeholder.com/160x160?text=Profile"
+                            }
+                            alt={profile?.name || "User"}
+                            className="profile-avatar"
+                        />
+
+                        <div>
+                            <h2>{profile?.name}</h2>
+                            <p><strong>Email:</strong> {profile?.email}</p>
+                            <p><strong>Phone:</strong> {profile?.phone || "Not added yet"}</p>
+                            <p><strong>City:</strong> {profile?.city || "Not added yet"}</p>
+                            <p><strong>Role:</strong> {profile?.role}</p>
+                        </div>
+                    </div>
+
+                    <Link to="/profile/edit" className="btn">
+                        Edit Profile
+                    </Link>
+                </div>
+
+                <div className="profile-bio-box">
+                    <h3>About Me</h3>
+                    <p>{profile?.bio || "No bio added yet."}</p>
+                </div>
             </div>
 
             <div className="details-card section-card">
@@ -65,7 +97,6 @@ export default function Dashboard() {
                 </div>
 
                 {message && <p className="success-text">{message}</p>}
-                {error && <p className="error-text">{error}</p>}
 
                 {bookings.length === 0 ? (
                     <p>You have no bookings yet.</p>
