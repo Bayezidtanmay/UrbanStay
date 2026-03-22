@@ -15,10 +15,12 @@ export default function EditBroker() {
         phone: "",
         email: "",
         description: "",
-        image: "",
+        image: null,
         is_active: true,
     });
 
+    const [currentImage, setCurrentImage] = useState("");
+    const [imagePreview, setImagePreview] = useState("");
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState("");
@@ -40,9 +42,11 @@ export default function EditBroker() {
                     phone: data.phone || "",
                     email: data.email || "",
                     description: data.description || "",
-                    image: data.image || "",
+                    image: null,
                     is_active: Boolean(data.is_active),
                 });
+
+                setCurrentImage(data.image || "");
             } catch (err) {
                 setError(err.message || "Failed to load broker.");
             } finally {
@@ -54,7 +58,14 @@ export default function EditBroker() {
     }, [id]);
 
     function handleChange(e) {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type, checked, files } = e.target;
+
+        if (type === "file") {
+            const file = files[0] || null;
+            setForm((prev) => ({ ...prev, [name]: file }));
+            setImagePreview(file ? URL.createObjectURL(file) : "");
+            return;
+        }
 
         setForm((prev) => ({
             ...prev,
@@ -70,9 +81,24 @@ export default function EditBroker() {
         try {
             setSubmitting(true);
 
+            const formData = new FormData();
+            formData.append("_method", "PUT");
+            formData.append("name", form.name);
+            formData.append("area", form.area);
+            formData.append("specialty", form.specialty);
+            formData.append("languages", form.languages);
+            formData.append("phone", form.phone);
+            formData.append("email", form.email);
+            formData.append("description", form.description);
+            formData.append("is_active", form.is_active ? "1" : "0");
+
+            if (form.image) {
+                formData.append("image", form.image);
+            }
+
             const data = await apiFetch(`/admin/brokers/${id}`, {
-                method: "PUT",
-                body: JSON.stringify(form),
+                method: "POST",
+                body: formData,
             });
 
             setSuccess(data.message || "Broker updated successfully.");
@@ -115,8 +141,16 @@ export default function EditBroker() {
                 <label>Description</label>
                 <textarea name="description" rows="5" value={form.description} onChange={handleChange} />
 
-                <label>Image URL</label>
-                <input type="text" name="image" value={form.image} onChange={handleChange} />
+                <label>Upload New Broker Photo</label>
+                <input type="file" name="image" accept="image/*" onChange={handleChange} />
+
+                {currentImage && !imagePreview && (
+                    <img src={currentImage} alt="Current broker" className="image-preview" />
+                )}
+
+                {imagePreview && (
+                    <img src={imagePreview} alt="Broker preview" className="image-preview" />
+                )}
 
                 <label className="checkbox-row">
                     <input

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Broker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BrokerController extends Controller
 {
@@ -56,11 +57,27 @@ class BrokerController extends Controller
             'phone' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active' => ['nullable', 'boolean'],
         ]);
 
-        $broker = Broker::create($validated);
+        $imagePath = null;
+
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('brokers', 'public');
+        }
+
+        $broker = Broker::create([
+            'name' => $validated['name'],
+            'area' => $validated['area'],
+            'specialty' => $validated['specialty'],
+            'languages' => $validated['languages'] ?? null,
+            'phone' => $validated['phone'],
+            'email' => $validated['email'],
+            'description' => $validated['description'] ?? null,
+            'image' => $imagePath ? asset('storage/' . $imagePath) : null,
+            'is_active' => $validated['is_active'] ?? true,
+        ]);
 
         return response()->json([
             'message' => 'Broker created successfully',
@@ -86,9 +103,19 @@ class BrokerController extends Controller
             'phone' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'max:255'],
             'description' => ['nullable', 'string'],
-            'image' => ['nullable', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'is_active' => ['nullable', 'boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($broker->image) {
+                $oldPath = str_replace(asset('storage/') . '/', '', $broker->image);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $newImagePath = $request->file('image')->store('brokers', 'public');
+            $validated['image'] = asset('storage/' . $newImagePath);
+        }
 
         $broker->update($validated);
 
@@ -106,6 +133,11 @@ class BrokerController extends Controller
             return response()->json([
                 'message' => 'Broker not found',
             ], 404);
+        }
+
+        if ($broker->image) {
+            $oldPath = str_replace(asset('storage/') . '/', '', $broker->image);
+            Storage::disk('public')->delete($oldPath);
         }
 
         $broker->delete();

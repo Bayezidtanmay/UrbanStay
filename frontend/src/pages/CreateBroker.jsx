@@ -13,16 +13,24 @@ export default function CreateBroker() {
         phone: "",
         email: "",
         description: "",
-        image: "",
+        image: null,
         is_active: true,
     });
 
+    const [imagePreview, setImagePreview] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
     function handleChange(e) {
-        const { name, value, type, checked } = e.target;
+        const { name, value, type, checked, files } = e.target;
+
+        if (type === "file") {
+            const file = files[0] || null;
+            setForm((prev) => ({ ...prev, [name]: file }));
+            setImagePreview(file ? URL.createObjectURL(file) : "");
+            return;
+        }
 
         setForm((prev) => ({
             ...prev,
@@ -38,9 +46,23 @@ export default function CreateBroker() {
         try {
             setSubmitting(true);
 
+            const formData = new FormData();
+            formData.append("name", form.name);
+            formData.append("area", form.area);
+            formData.append("specialty", form.specialty);
+            formData.append("languages", form.languages);
+            formData.append("phone", form.phone);
+            formData.append("email", form.email);
+            formData.append("description", form.description);
+            formData.append("is_active", form.is_active ? "1" : "0");
+
+            if (form.image) {
+                formData.append("image", form.image);
+            }
+
             const data = await apiFetch("/admin/brokers", {
                 method: "POST",
-                body: JSON.stringify(form),
+                body: formData,
             });
 
             setSuccess(data.message || "Broker created successfully.");
@@ -81,8 +103,12 @@ export default function CreateBroker() {
                 <label>Description</label>
                 <textarea name="description" rows="5" value={form.description} onChange={handleChange} />
 
-                <label>Image URL</label>
-                <input type="text" name="image" value={form.image} onChange={handleChange} />
+                <label>Broker Photo</label>
+                <input type="file" name="image" accept="image/*" onChange={handleChange} />
+
+                {imagePreview && (
+                    <img src={imagePreview} alt="Broker preview" className="image-preview" />
+                )}
 
                 <label className="checkbox-row">
                     <input
