@@ -10,6 +10,10 @@ import {
     PieChart,
     Pie,
     Cell,
+    LineChart,
+    Line,
+    CartesianGrid,
+    Legend,
 } from "recharts";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
@@ -51,6 +55,8 @@ export default function AdminDashboard() {
     const summary = data?.summary || {};
     const bookingStatus = data?.booking_status || [];
     const bookingsByLocation = data?.bookings_by_location || [];
+    const monthlyRevenue = data?.monthly_revenue || [];
+    const monthlyBookings = data?.monthly_bookings || [];
     const recentBookings = data?.recent_bookings || [];
 
     const pieColors = ["#2563eb", "#f59e0b", "#ef4444", "#10b981", "#8b5cf6"];
@@ -64,6 +70,7 @@ export default function AdminDashboard() {
         { label: "Favorites", value: summary.total_favorites || 0 },
         { label: "Contact Messages", value: summary.total_contact_messages || 0 },
         { label: "Broker Messages", value: summary.total_broker_messages || 0 },
+        { label: "Confirmed Revenue (€)", value: summary.total_revenue || 0 },
     ];
 
     return (
@@ -113,11 +120,50 @@ export default function AdminDashboard() {
                     ) : (
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={bookingsByLocation}>
+                                <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="name" />
                                 <YAxis allowDecimals={false} />
                                 <Tooltip />
                                 <Bar dataKey="total" />
                             </BarChart>
+                        </ResponsiveContainer>
+                    )}
+                </div>
+            </div>
+
+            <div className="analytics-grid">
+                <div className="analytics-card">
+                    <h2>Monthly Revenue Trend</h2>
+                    {monthlyRevenue.length === 0 ? (
+                        <p>No confirmed revenue data yet.</p>
+                    ) : (
+                        <ResponsiveContainer width="100%" height={320}>
+                            <LineChart data={monthlyRevenue}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="month" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Line type="monotone" dataKey="total" name="Revenue (€)" strokeWidth={3} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    )}
+                </div>
+
+                <div className="analytics-card">
+                    <h2>Monthly Booking Trend</h2>
+                    {monthlyBookings.length === 0 ? (
+                        <p>No booking trend data yet.</p>
+                    ) : (
+                        <ResponsiveContainer width="100%" height={320}>
+                            <LineChart data={monthlyBookings}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="month" />
+                                <YAxis allowDecimals={false} />
+                                <Tooltip />
+                                <Legend />
+                                <Line type="monotone" dataKey="total" name="Bookings" strokeWidth={3} />
+                            </LineChart>
                         </ResponsiveContainer>
                     )}
                 </div>

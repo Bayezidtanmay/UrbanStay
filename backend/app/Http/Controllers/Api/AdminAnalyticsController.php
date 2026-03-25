@@ -25,6 +25,7 @@ class AdminAnalyticsController extends Controller
             'total_favorites' => Favorite::count(),
             'total_contact_messages' => ContactMessage::count(),
             'total_broker_messages' => BrokerMessage::count(),
+            'total_revenue' => Booking::where('status', 'confirmed')->sum('total_price'),
         ];
 
         $bookingStatus = Booking::select('status', DB::raw('COUNT(*) as total'))
@@ -52,6 +53,31 @@ class AdminAnalyticsController extends Controller
             })
             ->values();
 
+        $monthlyRevenue = Booking::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, SUM(total_price) as total")
+            ->where('status', 'confirmed')
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'total' => (float) $item->total,
+                ];
+            })
+            ->values();
+
+        $monthlyBookings = Booking::selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as total")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => $item->month,
+                    'total' => (int) $item->total,
+                ];
+            })
+            ->values();
+
         $recentBookings = Booking::with([
             'user:id,name,email',
             'apartment:id,title,location',
@@ -64,6 +90,8 @@ class AdminAnalyticsController extends Controller
             'summary' => $summary,
             'booking_status' => $bookingStatus,
             'bookings_by_location' => $bookingsByLocation,
+            'monthly_revenue' => $monthlyRevenue,
+            'monthly_bookings' => $monthlyBookings,
             'recent_bookings' => $recentBookings,
         ]);
     }
