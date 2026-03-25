@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\BrokerController;
 use App\Http\Controllers\Api\BrokerMessageController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\AdminAnalyticsController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -51,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/admin/brokers', [BrokerController::class, 'store']);
         Route::put('/admin/brokers/{id}', [BrokerController::class, 'update']);
         Route::delete('/admin/brokers/{id}', [BrokerController::class, 'destroy']);
+        Route::get('/admin/analytics', [AdminAnalyticsController::class, 'index']);
 
         Route::get('/admin/broker-messages', [BrokerMessageController::class, 'index']);
         Route::delete('/admin/broker-messages/{id}', [BrokerMessageController::class, 'destroy']);
