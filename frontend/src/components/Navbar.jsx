@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
     const { user, logout, isAdmin } = useAuth();
@@ -51,6 +52,7 @@ export default function Navbar() {
                             <button onClick={handleLogout} className="btn btn-small">
                                 Logout
                             </button>
+                            <NotificationBell />
                         </>
                     )}
                 </div>
