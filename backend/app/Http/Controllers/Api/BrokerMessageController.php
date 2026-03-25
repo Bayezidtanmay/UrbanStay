@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Broker;
 use App\Models\BrokerMessage;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class BrokerMessageController extends Controller
@@ -32,6 +33,19 @@ class BrokerMessageController extends Controller
             'email' => $validated['email'],
             'message' => $validated['message'],
         ]);
+
+        NotificationService::sendToAdmins(
+            'broker_message',
+            'New broker message',
+            $validated['name'] . ' sent a message to broker ' . $broker->name . '.',
+            '/admin/broker-messages',
+            [
+                'broker_id' => $broker->id,
+                'broker_message_id' => $brokerMessage->id,
+                'sender_name' => $validated['name'],
+                'sender_email' => $validated['email'],
+            ]
+        );
 
         return response()->json([
             'message' => 'Message sent to broker successfully',

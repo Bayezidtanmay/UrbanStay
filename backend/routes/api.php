@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\BrokerController;
 use App\Http\Controllers\Api\BrokerMessageController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\NotificationController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -61,4 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/favorites/{apartmentId}', [FavoriteController::class, 'destroy']);
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::post('/profile', [ProfileController::class, 'update']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 });

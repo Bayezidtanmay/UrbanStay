@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Apartment;
 use App\Models\Booking;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -102,9 +103,23 @@ class BookingController extends Controller
             'status' => 'pending',
         ]);
 
+        $booking->load('apartment:id,title,location', 'user:id,name,email');
+
+        NotificationService::sendToAdmins(
+            'booking_created',
+            'New booking received',
+            $request->user()->name . ' created a new booking for ' . $apartment->title . '.',
+            '/admin/bookings',
+            [
+                'booking_id' => $booking->id,
+                'apartment_id' => $apartment->id,
+                'user_id' => $request->user()->id,
+            ]
+        );
+
         return response()->json([
             'message' => 'Booking created successfully',
-            'booking' => $booking->load('apartment:id,title,location', 'user:id,name,email'),
+            'booking' => $booking,
         ], 201);
     }
 
@@ -135,7 +150,10 @@ class BookingController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $booking = Booking::find($id);
+        $booking = Booking::with([
+            'user:id,name,email',
+            'apartment:id,title,location'
+        ])->find($id);
 
         if (! $booking) {
             return response()->json([
@@ -151,6 +169,19 @@ class BookingController extends Controller
             'status' => $validated['status'],
         ]);
 
+        NotificationService::send(
+            $booking->user_id,
+            'booking_status_updated',
+            'Booking status updated',
+            'Your booking for ' . $booking->apartment->title . ' is now ' . $booking->status . '.',
+            '/dashboard',
+            [
+                'booking_id' => $booking->id,
+                'status' => $booking->status,
+                'apartment_id' => $booking->apartment_id,
+            ]
+        );
+
         return response()->json([
             'message' => 'Booking status updated successfully',
             'booking' => $booking,
@@ -159,7 +190,10 @@ class BookingController extends Controller
 
     public function cancel(Request $request, $id)
     {
-        $booking = Booking::find($id);
+        $booking = Booking::with([
+            'user:id,name,email',
+            'apartment:id,title,location'
+        ])->find($id);
 
         if (! $booking) {
             return response()->json([
@@ -179,6 +213,20 @@ class BookingController extends Controller
         $booking->update([
             'status' => 'cancelled',
         ]);
+
+        if ($request->user()->role === 'admin') {
+            NotificationService::send(
+                $booking->user_id,
+                'booking_cancelled',
+                'Booking cancelled',
+                'Your booking for ' . $booking->apartment->title . ' has been cancelled by admin.',
+                '/dashboard',
+                [
+                    'booking_id' => $booking->id,
+                    'apartment_id' => $booking->apartment_id,
+                ]
+            );
+        }
 
         return response()->json([
             'message' => 'Booking cancelled successfully',

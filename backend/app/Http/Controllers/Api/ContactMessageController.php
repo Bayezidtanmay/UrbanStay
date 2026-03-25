@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Apartment;
 use App\Models\ContactMessage;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class ContactMessageController extends Controller
@@ -31,6 +32,19 @@ class ContactMessageController extends Controller
             'email' => $validated['email'],
             'message' => $validated['message'],
         ]);
+
+        NotificationService::sendToAdmins(
+            'apartment_contact_message',
+            'New apartment inquiry',
+            $validated['name'] . ' sent a message about apartment ' . $apartment->title . '.',
+            '/admin/messages',
+            [
+                'apartment_id' => $apartment->id,
+                'contact_message_id' => $contactMessage->id,
+                'sender_name' => $validated['name'],
+                'sender_email' => $validated['email'],
+            ]
+        );
 
         return response()->json([
             'message' => 'Message sent successfully',
