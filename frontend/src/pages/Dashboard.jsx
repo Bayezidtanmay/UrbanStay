@@ -93,7 +93,9 @@ export default function Dashboard() {
             <div className="details-card section-card">
                 <div className="section-header">
                     <h2>My Bookings</h2>
-                    <p>{bookings.length} booking{bookings.length !== 1 ? "s" : ""}</p>
+                    <p>
+                        {bookings.length} booking{bookings.length !== 1 ? "s" : ""}
+                    </p>
                 </div>
 
                 {message && <p className="success-text">{message}</p>}
@@ -118,18 +120,26 @@ export default function Dashboard() {
                                     <p><strong>Start Date:</strong> {booking.start_date}</p>
                                     <p><strong>End Date:</strong> {booking.end_date}</p>
                                     <p><strong>Total Price:</strong> €{booking.total_price}</p>
+                                    <p><strong>Payment Status:</strong> {booking.payment_status || "unpaid"}</p>
                                 </div>
 
-                                {booking.status !== "cancelled" && (
-                                    <div className="booking-actions">
+                                <div className="booking-actions">
+                                    {booking.status !== "cancelled" && (
                                         <button
                                             className="btn btn-danger"
                                             onClick={() => handleCancelBooking(booking.id)}
                                         >
                                             Cancel Booking
                                         </button>
-                                    </div>
-                                )}
+                                    )}
+
+                                    {booking.payment_status !== "paid" &&
+                                        booking.status !== "cancelled" && (
+                                            <Link to={`/checkout/${booking.id}`} className="btn">
+                                                Proceed to Checkout
+                                            </Link>
+                                        )}
+                                </div>
                             </div>
                         ))}
                     </div>

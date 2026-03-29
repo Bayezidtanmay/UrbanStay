@@ -22,6 +22,7 @@ import CreateBroker from "../pages/CreateBroker";
 import EditBroker from "../pages/EditBroker";
 import AdminBrokerMessages from "../pages/AdminBrokerMessages";
 import EditProfile from "../pages/EditProfile";
+import Checkout from "../pages/Checkout";
 
 export default function AppRouter() {
     return (
@@ -150,6 +151,15 @@ export default function AppRouter() {
                     element={
                         <ProtectedRoute>
                             <EditProfile />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/checkout/:bookingId"
+                    element={
+                        <ProtectedRoute>
+                            <Checkout />
                         </ProtectedRoute>
                     }
                 />
