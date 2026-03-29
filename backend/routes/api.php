@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\BrokerMessageController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\AdminAnalyticsController;
+use App\Http\Controllers\Api\CheckoutController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -36,6 +37,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/apartments/{id}/reviews', [ReviewController::class, 'store']);
     Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
+
+    Route::get('/checkout/{bookingId}', [CheckoutController::class, 'show']);
+    Route::post('/checkout/{bookingId}/pay', [CheckoutController::class, 'pay']);
 
     Route::middleware('admin')->group(function () {
         Route::post('/apartments', [ApartmentController::class, 'store']);

@@ -17,12 +17,16 @@ class Booking extends Model
         'end_date',
         'total_price',
         'status',
+        'payment_status',
+        'payment_method',
+        'paid_at',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
         'total_price' => 'decimal:2',
+        'paid_at' => 'datetime',
     ];
 
     public function user()
