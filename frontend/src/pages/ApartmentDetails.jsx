@@ -105,25 +105,30 @@ export default function ApartmentDetails() {
                 title={apartment.title}
             />
 
-            <div className="details-card">
-                <p><strong>Location:</strong> {apartment.location}</p>
-                <p><strong>Address:</strong> {apartment.address}</p>
-                <p><strong>Description:</strong> {apartment.description}</p>
-                <p><strong>Rental Type:</strong> {apartment.rental_type}</p>
-                <p><strong>Bedrooms:</strong> {apartment.bedrooms}</p>
-                <p><strong>Bathrooms:</strong> {apartment.bathrooms}</p>
-                <p><strong>Size:</strong> {apartment.size} m²</p>
-                <p><strong>Availability:</strong> {apartment.is_available ? "Available" : "Not available"}</p>
-                <p><strong>Average Rating:</strong> {average_rating ?? "No rating yet"}</p>
-                <p><strong>Total Reviews:</strong> {total_reviews}</p>
+            <div className="details-grid">
+                <div className="details-card">
+                    <p><strong>Location:</strong> {apartment.location}</p>
+                    <p><strong>Address:</strong> {apartment.address}</p>
+                    <p><strong>Description:</strong> {apartment.description}</p>
+                    <p><strong>Rental Type:</strong> {apartment.rental_type}</p>
+                    <p><strong>Availability:</strong> {apartment.is_available ? "Available" : "Not available"}</p>
+                </div>
 
-                {apartment.price_per_night && (
-                    <p><strong>Price per night:</strong> €{apartment.price_per_night}</p>
-                )}
+                <div className="details-card">
+                    <p><strong>Bedrooms:</strong> {apartment.bedrooms}</p>
+                    <p><strong>Bathrooms:</strong> {apartment.bathrooms}</p>
+                    <p><strong>Size:</strong> {apartment.size} m²</p>
+                    <p><strong>Average Rating:</strong> {average_rating ?? "No rating yet"}</p>
+                    <p><strong>Total Reviews:</strong> {total_reviews}</p>
 
-                {apartment.price_per_month && (
-                    <p><strong>Price per month:</strong> €{apartment.price_per_month}</p>
-                )}
+                    {apartment.price_per_night && (
+                        <p><strong>Price per night:</strong> €{apartment.price_per_night}</p>
+                    )}
+
+                    {apartment.price_per_month && (
+                        <p><strong>Price per month:</strong> €{apartment.price_per_month}</p>
+                    )}
+                </div>
             </div>
 
             <ApartmentMap
