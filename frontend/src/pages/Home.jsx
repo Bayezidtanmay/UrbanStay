@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import FeaturedApartments from "../components/FeaturedApartments";
+import WhyChooseUs from "../components/WhyChooseUs";
+import BlogSection from "../components/BlogSection";
 
 export default function Home() {
     return (
@@ -13,6 +16,10 @@ export default function Home() {
                     Explore Apartments
                 </Link>
             </section>
+
+            <FeaturedApartments />
+            <WhyChooseUs />
+            <BlogSection />
         </div>
     );
 }
