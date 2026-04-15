@@ -64,7 +64,7 @@ export default function NotificationBell() {
                 className="notification-bell"
                 onClick={() => setOpen((prev) => !prev)}
             >
-                🔔
+                <span className="notification-bell-icon">🔔</span>
                 {unreadCount > 0 && (
                     <span className="notification-badge">{unreadCount}</span>
                 )}
