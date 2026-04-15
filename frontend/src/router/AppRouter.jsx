@@ -23,6 +23,7 @@ import EditBroker from "../pages/EditBroker";
 import AdminBrokerMessages from "../pages/AdminBrokerMessages";
 import EditProfile from "../pages/EditProfile";
 import Checkout from "../pages/Checkout";
+import Footer from "../components/Footer";
 
 export default function AppRouter() {
     return (
@@ -164,6 +165,7 @@ export default function AppRouter() {
                     }
                 />
             </Routes>
+            <Footer />
         </BrowserRouter>
     );
 }
