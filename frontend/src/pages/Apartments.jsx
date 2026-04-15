@@ -4,6 +4,7 @@ import "rc-slider/assets/index.css";
 import { apiFetch } from "../api/client";
 import ApartmentCard from "../components/ApartmentCard";
 import Loading from "../components/Loading";
+import SkeletonGrid from "../components/SkeletonGrid";
 
 export default function Apartments() {
     const [apartments, setApartments] = useState([]);
@@ -241,7 +242,7 @@ export default function Apartments() {
             </form>
 
             {loading ? (
-                <Loading />
+                <SkeletonGrid count={6} />
             ) : error ? (
                 <p className="error-text">{error}</p>
             ) : apartments.length === 0 ? (

@@ -38,20 +38,26 @@ export default function Navbar() {
                             {isAdmin && <Link to="/admin">Admin</Link>}
 
                             <Link to="/profile/edit" className="navbar-user">
-                                <img
-                                    src={
-                                        user.profile_photo ||
-                                        "https://via.placeholder.com/80x80?text=U"
-                                    }
-                                    alt={user.name}
-                                    className="navbar-avatar"
-                                />
-                                <span>Hi, {user.name}</span>
+                                <span className="navbar-avatar-wrap">
+                                    <img
+                                        src={
+                                            user.profile_photo ||
+                                            "https://via.placeholder.com/80x80?text=U"
+                                        }
+                                        alt={user.name || "User"}
+                                        className="navbar-avatar"
+                                    />
+                                </span>
+
+                                <span className="navbar-user-text">
+                                    Hi, {user.name}
+                                </span>
                             </Link>
 
                             <button onClick={handleLogout} className="btn btn-small">
                                 Logout
                             </button>
+
                             <NotificationBell />
                         </>
                     )}

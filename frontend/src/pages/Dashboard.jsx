@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import Loading from "../components/Loading";
 import BookingStatusBadge from "../components/BookingStatusBadge";
+import SkeletonGrid from "../components/SkeletonGrid";
+import SkeletonProfile from "../components/SkeletonProfile";
 
 export default function Dashboard() {
     const [profile, setProfile] = useState(null);
@@ -50,7 +52,15 @@ export default function Dashboard() {
         }
     }
 
-    if (loading) return <Loading />;
+    if (loading) {
+        return (
+            <div className="container page">
+                <h1>My Dashboard</h1>
+                <SkeletonProfile />
+                <SkeletonGrid count={3} />
+            </div>
+        );
+    }
 
     return (
         <div className="container page">
