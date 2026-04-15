@@ -1518,3 +1518,29 @@ p {
 .admin-header {
   animation: fadeUp 0.42s var(--ease-smooth);
 }
+
+.loading-wrapper {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  animation: fadeUp 0.35s var(--ease-smooth);
+}
+
+.loading-spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  border: 4px solid rgba(37, 99, 235, 0.14);
+  border-top-color: var(--primary);
+  border-right-color: rgba(37, 99, 235, 0.35);
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
