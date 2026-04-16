@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { apiFetch } from "../api/client";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../api/client";
+import { useFavorites } from "../context/FavoritesContext";
 import Loading from "../components/Loading";
 
 export default function Favorites() {
+    const { fetchFavorites: refreshFavoritesBadge } = useFavorites();
+
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    async function fetchFavorites() {
+    async function fetchFavoritesList() {
         try {
             setLoading(true);
             setError("");
@@ -23,17 +26,21 @@ export default function Favorites() {
 
     async function removeFavorite(apartmentId) {
         try {
+            setError("");
+
             await apiFetch(`/favorites/${apartmentId}`, {
                 method: "DELETE",
             });
-            fetchFavorites();
+
+            await refreshFavoritesBadge();
+            await fetchFavoritesList();
         } catch (err) {
             setError(err.message || "Failed to remove favorite.");
         }
     }
 
     useEffect(() => {
-        fetchFavorites();
+        fetchFavoritesList();
     }, []);
 
     if (loading) return <Loading />;

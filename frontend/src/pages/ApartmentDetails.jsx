@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiFetch } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { useFavorites } from "../context/FavoritesContext";
 import Loading from "../components/Loading";
 import BookingForm from "../components/BookingForm";
 import ReviewSection from "../components/ReviewSection";
@@ -13,10 +14,10 @@ import RecommendedBrokers from "../components/RecommendedBrokers";
 export default function ApartmentDetails() {
     const { id } = useParams();
     const { user } = useAuth();
+    const { isFavorite, toggleFavorite: toggleFavoriteGlobal } = useFavorites();
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [isFavorite, setIsFavorite] = useState(false);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
 
     useEffect(() => {
@@ -34,38 +35,12 @@ export default function ApartmentDetails() {
         fetchApartment();
     }, [id]);
 
-    useEffect(() => {
-        async function checkFavorite() {
-            if (!user || !id) return;
-
-            try {
-                const result = await apiFetch(`/favorites/check/${id}`);
-                setIsFavorite(result.is_favorite);
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        checkFavorite();
-    }, [user, id]);
-
     async function toggleFavorite() {
         if (!user || !data?.apartment) return;
 
         try {
             setFavoriteLoading(true);
-
-            if (isFavorite) {
-                await apiFetch(`/favorites/${data.apartment.id}`, {
-                    method: "DELETE",
-                });
-                setIsFavorite(false);
-            } else {
-                await apiFetch(`/favorites/${data.apartment.id}`, {
-                    method: "POST",
-                });
-                setIsFavorite(true);
-            }
+            await toggleFavoriteGlobal(data.apartment.id);
         } catch (error) {
             console.error(error.message);
         } finally {
@@ -80,6 +55,7 @@ export default function ApartmentDetails() {
     }
 
     const { apartment, average_rating, total_reviews } = data;
+    const apartmentIsFavorite = isFavorite(apartment.id);
 
     return (
         <div className="container page">
@@ -93,7 +69,7 @@ export default function ApartmentDetails() {
                 >
                     {favoriteLoading
                         ? "Saving..."
-                        : isFavorite
+                        : apartmentIsFavorite
                             ? "♥ Remove from Favorites"
                             : "♡ Save to Favorites"}
                 </button>

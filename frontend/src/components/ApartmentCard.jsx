@@ -1,51 +1,24 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { apiFetch } from "../api/client";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useFavorites } from "../context/FavoritesContext";
 
 export default function ApartmentCard({ apartment }) {
     const { user } = useAuth();
-
-    const [isFavorite, setIsFavorite] = useState(false);
+    const { isFavorite, toggleFavorite } = useFavorites();
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        async function checkFavorite() {
-            if (!user) return;
+    const favorite = isFavorite(apartment.id);
 
-            try {
-                const result = await apiFetch(`/favorites/check/${apartment.id}`);
-                setIsFavorite(result.is_favorite);
-            } catch (error) {
-                console.error(error.message);
-            }
-        }
-
-        checkFavorite();
-    }, [user, apartment.id]);
-
-    async function toggleFavorite(e) {
-        e.preventDefault(); // prevent card navigation
+    async function handleToggleFavorite(e) {
+        e.preventDefault();
         e.stopPropagation();
 
         if (!user) return;
 
         try {
             setLoading(true);
-
-            if (isFavorite) {
-                await apiFetch(`/favorites/${apartment.id}`, {
-                    method: "DELETE",
-                });
-                setIsFavorite(false);
-            } else {
-                await apiFetch(`/favorites/${apartment.id}`, {
-                    method: "POST",
-                });
-                setIsFavorite(true);
-            }
-        } catch (error) {
-            console.error(error.message);
+            await toggleFavorite(apartment.id);
         } finally {
             setLoading(false);
         }
@@ -53,15 +26,13 @@ export default function ApartmentCard({ apartment }) {
 
     return (
         <Link to={`/apartments/${apartment.id}`} className="apartment-card">
-
-            {/* FAVORITE ICON */}
             {user && (
                 <button
                     className="favorite-icon"
-                    onClick={toggleFavorite}
+                    onClick={handleToggleFavorite}
                     disabled={loading}
                 >
-                    {isFavorite ? "❤️" : "🤍"}
+                    {favorite ? "❤️" : "🤍"}
                 </button>
             )}
 
@@ -76,7 +47,6 @@ export default function ApartmentCard({ apartment }) {
 
             <div className="apartment-body">
                 <h3>{apartment.title}</h3>
-
                 <p>{apartment.location}</p>
 
                 <div className="prices">

@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useFavorites } from "../context/FavoritesContext";
 import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
     const { user, logout, isAdmin } = useAuth();
+    const { favoritesCount } = useFavorites();
     const navigate = useNavigate();
 
     async function handleLogout() {
@@ -22,7 +24,14 @@ export default function Navbar() {
                     <Link to="/">Home</Link>
                     <Link to="/apartments">Apartments</Link>
                     <Link to="/map">Map View</Link>
-                    <Link to="/favorites">Favorites</Link>
+
+                    <Link to="/favorites" className="favorites-nav-link">
+                        Favorites
+                        {user && favoritesCount > 0 && (
+                            <span className="favorites-badge">{favoritesCount}</span>
+                        )}
+                    </Link>
+
                     <Link to="/find-broker">Find a Broker</Link>
 
                     {!user && (
@@ -54,11 +63,11 @@ export default function Navbar() {
                                 </span>
                             </Link>
 
+                            <NotificationBell />
+
                             <button onClick={handleLogout} className="btn btn-small">
                                 Logout
                             </button>
-
-                            <NotificationBell />
                         </>
                     )}
                 </div>
