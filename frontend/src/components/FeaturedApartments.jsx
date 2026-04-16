@@ -9,11 +9,12 @@ export default function FeaturedApartments() {
         async function fetchData() {
             try {
                 const data = await apiFetch("/apartments");
-                setApartments(data.data.slice(0, 3)); // top 3
-            } catch (e) {
-                console.error(e);
+                setApartments((data.data || []).slice(0, 4));
+            } catch (error) {
+                console.error(error);
             }
         }
+
         fetchData();
     }, []);
 
@@ -21,8 +22,11 @@ export default function FeaturedApartments() {
         <section className="section">
             <div className="container">
                 <h2 className="section-title">Featured Apartments</h2>
+                <p className="section-subtitle">
+                    Handpicked stays in top locations for modern living and flexible booking.
+                </p>
 
-                <div className="grid">
+                <div className="featured-grid">
                     {apartments.map((apt) => (
                         <ApartmentCard key={apt.id} apartment={apt} />
                     ))}

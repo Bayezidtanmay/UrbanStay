@@ -1825,3 +1825,30 @@ p {
   text-align: center;
   box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
+
+/* Featured Apartments Grid */
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* Make cards consistent height */
+.featured-grid .apartment-card {
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .featured-grid {
+      grid-template-columns: 1fr;
+  }
+}
+
+.apartment-card {
+  transition: all 0.3s ease;
+}
+
+.apartment-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
