@@ -3,8 +3,10 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { apiFetch } from "../api/client";
 import ApartmentCard from "../components/ApartmentCard";
-import Loading from "../components/Loading";
 import SkeletonGrid from "../components/SkeletonGrid";
+
+const DEFAULT_NIGHT_RANGE = [0, 300];
+const DEFAULT_MONTH_RANGE = [0, 5000];
 
 export default function Apartments() {
     const [apartments, setApartments] = useState([]);
@@ -21,8 +23,8 @@ export default function Apartments() {
     const [availability, setAvailability] = useState("");
     const [sortBy, setSortBy] = useState("");
 
-    const [nightRange, setNightRange] = useState([0, 300]);
-    const [monthRange, setMonthRange] = useState([0, 5000]);
+    const [nightRange, setNightRange] = useState(DEFAULT_NIGHT_RANGE);
+    const [monthRange, setMonthRange] = useState(DEFAULT_MONTH_RANGE);
 
     async function fetchApartments(pageNumber = 1) {
         try {
@@ -38,10 +40,23 @@ export default function Apartments() {
             if (bathrooms) params.append("bathrooms", bathrooms);
             if (availability) params.append("is_available", availability);
 
-            params.append("night_min", nightRange[0]);
-            params.append("night_max", nightRange[1]);
-            params.append("month_min", monthRange[0]);
-            params.append("month_max", monthRange[1]);
+            const nightChanged =
+                nightRange[0] !== DEFAULT_NIGHT_RANGE[0] ||
+                nightRange[1] !== DEFAULT_NIGHT_RANGE[1];
+
+            const monthChanged =
+                monthRange[0] !== DEFAULT_MONTH_RANGE[0] ||
+                monthRange[1] !== DEFAULT_MONTH_RANGE[1];
+
+            if (nightChanged) {
+                params.append("night_min", nightRange[0]);
+                params.append("night_max", nightRange[1]);
+            }
+
+            if (monthChanged) {
+                params.append("month_min", monthRange[0]);
+                params.append("month_max", monthRange[1]);
+            }
 
             if (sortBy) {
                 if (sortBy === "night_price_asc") {
@@ -83,7 +98,6 @@ export default function Apartments() {
         fetchApartments(1);
     }, []);
 
-    // Instant auto-search with debounce
     useEffect(() => {
         const timeout = setTimeout(() => {
             fetchApartments(1);
@@ -113,8 +127,8 @@ export default function Apartments() {
         setBathrooms("");
         setAvailability("");
         setSortBy("");
-        setNightRange([0, 300]);
-        setMonthRange([0, 5000]);
+        setNightRange(DEFAULT_NIGHT_RANGE);
+        setMonthRange(DEFAULT_MONTH_RANGE);
     }
 
     function goToNextPage() {
@@ -132,7 +146,9 @@ export default function Apartments() {
     return (
         <div className="container page">
             <h1>Apartments</h1>
-            <p className="filter-auto-note">Filters update automatically as you adjust them.</p>
+            <p className="filter-auto-note">
+                Filters update automatically as you adjust them.
+            </p>
 
             <form className="filter-form advanced-filter-form" onSubmit={handleSubmit}>
                 <input
