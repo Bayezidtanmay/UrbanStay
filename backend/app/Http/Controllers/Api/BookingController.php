@@ -65,6 +65,20 @@ class BookingController extends Controller
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
 
+        if ($validated['booking_type'] === 'monthly') {
+            if (! $startDate->isSameDay($startDate->copy()->startOfMonth())) {
+                return response()->json([
+                    'message' => 'For monthly bookings, move-in date must be the 1st day of the month.',
+                ], 422);
+            }
+
+            if (! $endDate->isSameDay($endDate->copy()->endOfMonth())) {
+                return response()->json([
+                    'message' => 'For monthly bookings, move-out date must be the last day of the month.',
+                ], 422);
+            }
+        }
+
         $overlapExists = Booking::where('apartment_id', $apartment->id)
             ->whereIn('status', ['pending', 'confirmed'])
             ->where(function ($query) use ($startDate, $endDate) {

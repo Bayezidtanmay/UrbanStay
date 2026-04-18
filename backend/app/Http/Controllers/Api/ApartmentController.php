@@ -40,7 +40,7 @@ class ApartmentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Apartment::with('creator:id,name,email')->latest();
+        $query = Apartment::with('creator:id,name,email');
 
         if ($request->filled('location')) {
             $query->where('location', 'like', '%' . $request->location . '%');
@@ -86,6 +86,7 @@ class ApartmentController extends Controller
 
         if ($request->filled('is_available')) {
             $isAvailable = filter_var($request->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
             if (! is_null($isAvailable)) {
                 $query->where('is_available', $isAvailable);
             }
@@ -104,18 +105,20 @@ class ApartmentController extends Controller
         }
 
         $sortBy = $request->get('sort_by');
-        $sortOrder = $request->get('sort_order', 'asc');
+        $sortOrder = strtolower($request->get('sort_order', 'asc')) === 'desc' ? 'desc' : 'asc';
 
         if ($sortBy === 'night_price') {
-            $query->orderBy('price_per_night', $sortOrder);
+            $query->orderByRaw("price_per_night IS NULL, price_per_night {$sortOrder}");
         } elseif ($sortBy === 'month_price') {
-            $query->orderBy('price_per_month', $sortOrder);
+            $query->orderByRaw("price_per_month IS NULL, price_per_month {$sortOrder}");
         } elseif ($sortBy === 'bedrooms') {
             $query->orderBy('bedrooms', $sortOrder);
         } elseif ($sortBy === 'newest') {
             $query->orderBy('created_at', 'desc');
         } elseif ($sortBy === 'oldest') {
             $query->orderBy('created_at', 'asc');
+        } else {
+            $query->orderBy('created_at', 'desc');
         }
 
         $apartments = $query->paginate(20);
