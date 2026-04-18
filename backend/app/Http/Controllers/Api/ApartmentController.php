@@ -165,8 +165,18 @@ class ApartmentController extends Controller
             'bathrooms' => ['required', 'integer', 'min:1'],
             'size' => ['nullable', 'integer', 'min:1'],
             'is_available' => ['nullable', 'boolean'],
-            'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'gallery_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'featured_image' => [
+                'nullable',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/webp,image/avif',
+                'max:2048',
+            ],
+            'gallery_images.*' => [
+                'nullable',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/webp,image/avif',
+                'max:2048',
+            ],
         ]);
 
         $imagePath = null;
@@ -236,8 +246,18 @@ class ApartmentController extends Controller
             'bathrooms' => ['sometimes', 'integer', 'min:1'],
             'size' => ['nullable', 'integer', 'min:1'],
             'is_available' => ['nullable', 'boolean'],
-            'featured_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'gallery_images.*' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'featured_image' => [
+                'nullable',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/webp,image/avif',
+                'max:2048',
+            ],
+            'gallery_images.*' => [
+                'nullable',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/webp,image/avif',
+                'max:2048',
+            ],
             'replace_gallery' => ['nullable', 'boolean'],
         ]);
 
